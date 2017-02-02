@@ -1,5 +1,6 @@
 /*
  * Requests a certificate
+ * Usage: nodejs certrequest.js
  */
 
 var http = require('http');
@@ -22,7 +23,15 @@ function requestCert(csrdata) {
         });
 
         response.on('end', function() {
-            console.log("Body:\r\n" + body);
+            var response = JSON.parse(body);
+
+            if(response.success){
+                console.log(response.cert)
+                process.exit(0);
+            } else {
+                console.log("Failed to retrieve certificate. :(");
+                process.exit(1);
+            }
         });
     });
 
@@ -35,18 +44,22 @@ function requestCert(csrdata) {
     var json = JSON.stringify(jsonobj);
     req.write(json);
 
+    // Send request
     req.end();
 };
 
 
 
-/*
- * Read cert data from file
- */
-fs.readFile('./cert.csr', 'utf8', function(err, csrdata){
-    if(err == null) {
-        requestCert(csrdata);
-    } else {
-        console.log("Error reading file:" + err);
-    }
-});
+// Get csr filename
+if(process.argv[2] !== undefined) {
+    //Read cert data from file
+    fs.readFile('./' + process.argv[2], 'utf8', function(err, csrdata){
+        if(err == null) {
+            requestCert(csrdata);
+        } else {
+            console.log("Error reading file:" + err);
+        }
+    });
+} else {
+    console.log("Error:\r\nUsage: nodejs certrequest.js request.csr");
+}

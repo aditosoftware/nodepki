@@ -1,0 +1,6 @@
+server:
+    port: 8081
+
+ca:
+    basedir: mypki/
+    passphrase: jjdfhhk_348dsjj4JJhsk4j7svenjemHfen

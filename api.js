@@ -3,10 +3,12 @@
  * GET POST PUT DELETE
  */
 
+// 3rd party modules
 var fs = require('fs');
 var express = require('express');
 var bodyparser = require('body-parser');
 
+// Custom modules
 var certapi = require('./api/certificate.js');
 
 
@@ -14,10 +16,13 @@ var certapi = require('./api/certificate.js');
  * Initializes API paths.
  */
 var initAPI = function(app) {
+
+    // Always use JSON Body parsing for API endpoints.
     app.use(bodyparser.json());
 
+
     /*
-     * PUT
+     * PUT requests
      */
 
     app.put('/certificate/request/', function(req, res) {
@@ -25,9 +30,8 @@ var initAPI = function(app) {
     });
 
 
-
     /*
-     * GET
+     * GET requests
      */
 
     app.get('/certificate/:id/get/', function(req, res) {
@@ -39,6 +43,7 @@ var initAPI = function(app) {
 
 
 
+// Export initAPI() function
 module.exports = {
     initAPI: initAPI
 }
