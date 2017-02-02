@@ -9,9 +9,9 @@
 
 * Request a new signed certificate via certrequest.js client
 
+
 ## ToDo
 
-* Temporäres Verzeichnis fit für parallele Anfragen machen
 * Implement more API endpoints
 * Feature: Revocation
 * Tidy up code
@@ -22,10 +22,10 @@
 * Check install instructions
 * Build docker image
 
+
 ## Bugs
 
-* Remvoe temporary files even if cert process fails
-
+...
 
 
 ## Requirements

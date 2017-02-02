@@ -19,7 +19,6 @@ var api = require('./api.js');
  * Server start  *
  * * * * * * * * */
 
-
 console.log("NodePKI is starting up ...");
 
 console.log("Reading config file ...");
@@ -32,8 +31,8 @@ global.paths = {
     tempdir: __dirname + "/tmp/"
 };
 
-console.log("CA password: " + global.config.ca.password);
 
+// Start HTTP server
 var server = app.listen(global.config.server.port, function() {
     var host = server.address().address;
     var port = server.address().port;
