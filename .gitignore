@@ -1,2 +1,14 @@
+##
+## Ignore installed NodeJS modules
+##
+
 node_modules/
-mypki/newcerts/
+
+
+##
+## Ignore everything from mypki except for some files
+##
+
+mypki/*
+!mypki/openssl.cnf
+!mypki/genpki.sh

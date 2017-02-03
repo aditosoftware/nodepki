@@ -38,7 +38,7 @@
 ## Install instructions
 
 ```
-git clone https://github.com/aditosoftware/nodepki.git
+git clone https://github.com/ThomasLeister/nodepki.git
 cd nodepki
 npm install  
 ```
