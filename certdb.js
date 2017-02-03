@@ -11,33 +11,39 @@ certificates = new Array();
 var regex = /([R,E,V])(\t)(.*)(\t)(.*)(\t)(\d*)(\t)(unknown)(\t)(.*)/;
 
 
-// Index-Datei öffnen
-var lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./mypki/index.txt')
-});
-
 
 var reindex = function() {
-    console.log("Reindexing cert DB...")
-
     return new Promise(function(resolve, reject) {
+        console.log("Reindexing cert DB...")
+
+        // Index-Datei öffnen
+        var lineReader = require('readline').createInterface({
+            input: require('fs').createReadStream('./mypki/index.txt')
+        });
+
+        certificates = [];
+
         lineReader.on('line', function (line) {
             // Regex auf diese Zeile anwenden, um einzelne Spalten zu gewinnen.
             var columns = regex.exec(line);
 
-            var certificate = {
-                validity:   columns[1],
-                expirationtime:    columns[3],
-                revocationtime:     columns[5],
-                serial:     columns[7],
-                subject:    columns[11]
-            };
+            console.log("Colums length_ " + columns.len);
+            if(columns !== null){
+                var certificate = {
+                    validity:   columns[1],
+                    expirationtime:    columns[3],
+                    revocationtime:     columns[5],
+                    serial:     columns[7],
+                    subject:    columns[11]
+                };
 
-            certificates.push(certificate);
+                certificates.push(certificate);
+            }
         });
 
         lineReader.on('close', function() {
             resolve();
+            console.log("Reindexing finished");
         });
     });
 }

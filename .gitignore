@@ -10,5 +10,7 @@ node_modules/
 ##
 
 mypki/*
-!mypki/openssl.cnf
+!mypki/openssl.cnf.tpl
 !mypki/genpki.sh
+
+tmp/*

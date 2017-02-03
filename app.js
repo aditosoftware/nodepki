@@ -34,8 +34,10 @@ global.paths = {
 
 
 // Re-index cert database
+console.log("Re-indexing DB")
 certdb.reindex().then(function(){
     // Start HTTP server
+    console.log("Starting HTTP server")
     var server = app.listen(global.config.server.port, function() {
         var host = server.address().address;
         var port = server.address().port;
@@ -43,8 +45,8 @@ certdb.reindex().then(function(){
         console.log("Listening at http://%s:%s", host, port);
     });
 
-
     // Register API paths
+    console.log("Registering API endpoints");
     api.initAPI(app);
 });
 

@@ -1,5 +1,4 @@
 # OpenSSL root CA configuration file.
-# Copy to `/root/ca/openssl.cnf`.
 
 [ ca ]
 # `man ca`
