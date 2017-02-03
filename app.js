@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 var util = require('util');
 var fs = require('fs');
 var yaml = require('js-yaml');
+var log = require('fancy-log');
 
 var express = require('express');
 var app = express();
@@ -20,9 +21,9 @@ var certdb = require('./certdb.js');
  * Server start  *
  * * * * * * * * */
 
-console.log("NodePKI is starting up ...");
+log.info("NodePKI is starting up ...");
 
-console.log("Reading config file ...");
+log.info("Reading config file ...");
 global.config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
 
 // Base Base path of the application
@@ -34,19 +35,20 @@ global.paths = {
 
 
 // Re-index cert database
-console.log("Re-indexing DB")
+log.info("Re-indexing DB");
+
 certdb.reindex().then(function(){
     // Start HTTP server
-    console.log("Starting HTTP server")
-    var server = app.listen(global.config.server.port, function() {
+    log.info("Starting HTTP server");
+    var server = app.listen(global.config.server.port, global.config.server.ip, function() {
         var host = server.address().address;
         var port = server.address().port;
 
-        console.log("Listening at http://%s:%s", host, port);
+        log.info("Listening on " + host + ":" + port);
     });
 
     // Register API paths
-    console.log("Registering API endpoints");
+    log.info("Registering API endpoints");
     api.initAPI(app);
 });
 

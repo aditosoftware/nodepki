@@ -1,6 +1,7 @@
 /*
  * DB driver for PKI index.txt
  */
+ var log = require('fancy-log');
 
 
 certificates = new Array();
@@ -14,7 +15,7 @@ var regex = /([R,E,V])(\t)(.*)(\t)(.*)(\t)(\d*)(\t)(unknown)(\t)(.*)/;
 
 var reindex = function() {
     return new Promise(function(resolve, reject) {
-        console.log("Reindexing cert DB...")
+        log.info("Reindexing cert DB...");
 
         // Index-Datei öffnen
         var lineReader = require('readline').createInterface({
@@ -27,7 +28,6 @@ var reindex = function() {
             // Regex auf diese Zeile anwenden, um einzelne Spalten zu gewinnen.
             var columns = regex.exec(line);
 
-            console.log("Colums length_ " + columns.len);
             if(columns !== null){
                 var certificate = {
                     validity:   columns[1],
@@ -43,7 +43,7 @@ var reindex = function() {
 
         lineReader.on('close', function() {
             resolve();
-            console.log("Reindexing finished");
+            log.info("Reindexing finished");
         });
     });
 }

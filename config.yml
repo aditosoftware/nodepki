@@ -1,6 +1,6 @@
 server:
+    ip: 192.168.42.53
     port: 8081
 
 ca:
-    basedir: mypki/
     passphrase: yyyy

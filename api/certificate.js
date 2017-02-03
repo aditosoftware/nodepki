@@ -11,6 +11,7 @@ var exec = require('child_process').exec;
 
 const uuidV4 = require('uuid/v4');
 var rmdir = require('rmdir');
+var log = require('fancy-log');
 
 var certdb = require('../certdb.js');
 
@@ -30,7 +31,7 @@ function respond(res, resobj) {
  * Request method creates certificate from .csr file
  */
 certificate.request = function(req, res){
-    console.log("------\r\nCertificate request by %s ...", req.body.applicant);
+    log.info("------\r\nCertificate request by %s ...", req.body.applicant);
     csr = req.body.csr;
 
     // Create temporary directory ...
@@ -58,23 +59,24 @@ certificate.request = function(req, res){
                                         cert: certdata
                                     }, res);
 
-                                    console.log("Sent certificate to client.");
+                                    log.info("Sent certificate to client.");
                                     resolve();
                                 } else {
-                                    console.log("Could not read generated cert file:\r\n" + err);
+                                    log.error("Could not read generated cert file:\r\n" + err);
                                     respond({success: false}, res);
                                     resolve();
                                 }
                             });
                         });
                     } else {
-                        console.log("OpenSSL Error:\r\n", error);
+                        log.error("OpenSSL Error:\r\n", error);
                         respond({success: false}, res);
+                        log.error("Could not issue certificate. Maybe there was already a certificate created from the submitted .CSR?");
                         resolve();
                     }
                 });
             } else {
-                console.log("Could not write temporary request.csr file.\r\n Error: " + err);
+                log.error("Could not write temporary request.csr file.\r\n Error: " + err);
                 respond({success: false}, res);
                 resolve();
             }
@@ -90,7 +92,7 @@ certificate.request = function(req, res){
 
 
 certificate.revoke = function(req, res){
-    console.log("Revocation request for certificate");
+    log.info("Revocation request for certificate");
 
     // Create temporary directory ...
     var tempdir = global.paths.tempdir + uuidV4() + "/";
@@ -107,7 +109,7 @@ certificate.revoke = function(req, res){
                 exec(revokecommand, { cwd: tempdir }, function(error, stdout, stderr) {
                     if (error === null) {
                         certdb.reindex().then(function(){
-                            console.log("Successfully revoked certificate.");
+                            log.info("Successfully revoked certificate.");
 
                             respond({
                                 success: true
@@ -116,13 +118,13 @@ certificate.revoke = function(req, res){
                             resolve();
                         });
                     } else {
-                        console.log("OpenSSL Error:\r\n", error);
+                        log.error("OpenSSL Error:\r\n", error);
                         respond({success: false}, res);
                         resolve();
                     }
                 });
             } else {
-                console.log("Failed to write certificate to temporary file.");
+                log.error("Failed to write certificate to temporary file.");
                 respond({success: false}, res);
                 resolve();
             }
@@ -141,7 +143,7 @@ certificate.revoke = function(req, res){
  * Lists all certificates
  */
 certificates.list = function(req, res){
-    console.log("Request: List all active certificates. Filter: " + req.params.filter);
+    log.info("Request: List all active certificates. Filter: " + req.params.filter);
 
     var filter = '';
 
@@ -186,14 +188,14 @@ certificates.list = function(req, res){
 
 
 certificate.get = function(req, res) {
-    console.log("Client is requesting certificate " + req.params.serial);
+    log.info("Client is requesting certificate " + req.params.serial);
 
     var certfile = global.paths.pkipath + "newcerts/" + req.params.serial + ".pem";
 
     if(fs.existsSync(certfile)){
         fs.readFile(certfile, 'utf8', function(err, certdata){
             if(err) {
-                console.log("Could not read certificate file.");
+                log.error("Could not read certificate file.");
                 respond({ success: false }, res);
             } else {
                 respond({

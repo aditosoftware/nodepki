@@ -5,6 +5,7 @@
 
 var http = require('http');
 var fs = require('fs');
+var log = require('fancy-log');
 
 function requestCert(csrdata) {
     var req = http.request({
@@ -29,7 +30,9 @@ function requestCert(csrdata) {
                 console.log(response.cert)
                 process.exit(0);
             } else {
-                console.log("Failed to retrieve certificate. :(");
+                log.error(">>> Failed to retrieve certificate. :( <<<");
+                log.error("Maybe there was already another certificate issued from the submitted .csr?");
+                log.error("For more information see NodePKI log.");
                 process.exit(1);
             }
         });
@@ -57,9 +60,9 @@ if(process.argv[2] !== undefined) {
         if(err == null) {
             requestCert(csrdata);
         } else {
-            console.log("Error reading file:" + err);
+            log.error("Error reading file:" + err);
         }
     });
 } else {
-    console.log("Error:\r\nUsage: nodejs certrequest.js request.csr");
+    log.error("Error:\r\nUsage: nodejs certrequest.js request.csr");
 }

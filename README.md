@@ -22,7 +22,7 @@
 * Bash Shell
 
 
-## Install instructions
+## Setup instructions
 
 ```
 git clone https://github.com/ThomasLeister/nodepki.git
@@ -36,6 +36,16 @@ npm install
 
 ```
 ./mypki/genpki.sh
+```
+
+## Configure NodePKI
+
+```
+server:
+    port: 8081
+
+ca:
+    passphrase: yyyy
 ```
 
 
