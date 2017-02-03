@@ -8,12 +8,16 @@
   },
   "keywords": [
     "x509",
-    "pki"
+    "pki",
+    "ca"
   ],
-  "author": "Thomas Leister <thomas@trashserver.net>",
-  "license": "Superlicense",
+  "author": "Thomas Leister <thomas.leister@mailbox.org>",
+  "license": "MIT",
 
   "dependencies": {
-
+      "express": "4.x",
+      "js-yaml": "3.x",
+      "body-parser": "1.x",
+      "uuid": "3.x"
   }
 }

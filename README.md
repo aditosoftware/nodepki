@@ -7,25 +7,16 @@
 
 ## Implemented Features
 
+* Auto-create a PKI
 * Request a new signed certificate via certrequest.js client
+* List available certificates
+* Download issued certificate files (without key!)
 
 
-## ToDo
 
-* Implement more API endpoints
-* Feature: Revocation
-* Tidy up code
-* Tidy up .gitignore and files
-* Fix external package versions.
-* Feature: Authenticate users
-* Finish Readme
-* Check install instructions
-* Build docker image
+## Known bugs
 
-
-## Bugs
-
-...
+[none]
 
 
 ## Requirements
@@ -33,6 +24,7 @@
 * NodeJS
 * NPM
 * OpenSSL
+* Bash Shell
 
 
 ## Install instructions
@@ -45,15 +37,11 @@ npm install
 
 ## Prerequisites
 
-### Create a OpenSSL X.509 PKI
+### Create OpenSSL X.509 PKI
 
-(in nodepki/mypki directory):
-
-* Create CA key:
-    ```openssl genrsa -aes256 -out private/ca.key.pem 4096```
-
-* Create (self-signed) CA Certificate:
-    ```openssl req -config openssl.cnf -key private/ca.key.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out certs/ca.cert.pem```
+```
+./mypki/genpki.sh
+```
 
 
 ## Request new certificate
