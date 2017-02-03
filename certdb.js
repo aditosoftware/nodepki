@@ -3,19 +3,15 @@
  */
  var log = require('fancy-log');
 
-
 certificates = new Array();
 
-
-
-// Sample: V	270129084423Z	270129084423Z	1000	unknown	/C=DE/ST=Germany/O=ADITO Software GmbH/OU=IT/CN=ADITO General Intermediate CA/emailAddress=it@adito.de
-var regex = /([R,E,V])(\t)(.*)(\t)(.*)(\t)(\d*)(\t)(unknown)(\t)(.*)/;
-
+// Sample: V	270129084423Z	270129084423Z	100E	unknown	/C=DE/ST=Germany/O=ADITO Software GmbH/OU=IT/CN=ADITO General Intermediate CA/emailAddress=it@adito.de
+var regex = /([R,E,V])(\t)(.*)(\t)(.*)(\t)([\dA-F]*)(\t)(unknown)(\t)(.*)/;
 
 
 var reindex = function() {
     return new Promise(function(resolve, reject) {
-        log.info("Reindexing cert DB...");
+        log.info("Reindexing CertDB ...");
 
         // Index-Datei öffnen
         var lineReader = require('readline').createInterface({
@@ -38,12 +34,14 @@ var reindex = function() {
                 };
 
                 certificates.push(certificate);
+            } else {
+                log.error("Error while parsing index.txt line :(");
             }
         });
 
         lineReader.on('close', function() {
-            resolve();
             log.info("Reindexing finished");
+            resolve();
         });
     });
 }

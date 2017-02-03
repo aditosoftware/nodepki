@@ -29,14 +29,12 @@ global.config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
 // Base Base path of the application
 global.paths = {
     basepath: __dirname + "/",
-    pkipath: __dirname + "/" + global.config.ca.basedir,
+    pkipath: __dirname + "/mypki/",
     tempdir: __dirname + "/tmp/"
 };
 
 
 // Re-index cert database
-log.info("Re-indexing DB");
-
 certdb.reindex().then(function(){
     // Start HTTP server
     log.info("Starting HTTP server");
@@ -50,6 +48,8 @@ certdb.reindex().then(function(){
     // Register API paths
     log.info("Registering API endpoints");
     api.initAPI(app);
+}).catch(function(error){
+    log.error("Could not initialize CertDB index: " + error);
 });
 
 

@@ -40,13 +40,25 @@ npm install
 
 ## Configure NodePKI
 
+Set IP and Port to your needs and provide the CA passphrase you entered before.
+
 ```
 server:
+    ip: 192.168.42.53
     port: 8081
 
 ca:
-    passphrase: yyyy
+    passphrase: MyIncrediblyLongAndRandomCAPassphrase
 ```
+
+## Start all the things!
+
+Start your API server:
+
+```
+nodejs app.js
+```
+
 
 
 ## Request new certificate

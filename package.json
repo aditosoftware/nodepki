@@ -1,34 +1,32 @@
 {
-    "name": "nodepki",
-    "version": "0.0.1",
-    "description": "NodeJS-based PKI server for x509 certificate management.",
-    "author": "Thomas Leister <thomas.leister@mailbox.org>",
-    "license": "MIT",
-    "keywords": [
-        "x509",
-        "pki",
-        "ca"
-    ],
-
-    "main": "app.js",
-
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/ThomasLeister/nodepki.git"
-    },
-
-    "bugs": {
-        "url": "https://github.com/ThomasLeister/nodepki/issues"
-    },
-
-    "dependencies": {
-        "express": "4.x",
-        "js-yaml": "3.x",
-        "body-parser": "1.x",
-        "uuid": "3.x"
-    }
+  "name": "nodepki",
+  "version": "0.0.1",
+  "description": "NodeJS-based PKI server for x509 certificate management.",
+  "author": "Thomas Leister <thomas.leister@mailbox.org>",
+  "license": "MIT",
+  "keywords": [
+    "x509",
+    "pki",
+    "ca"
+  ],
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ThomasLeister/nodepki.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ThomasLeister/nodepki/issues"
+  },
+  "dependencies": {
+    "express": "4.x",
+    "js-yaml": "3.x",
+    "body-parser": "1.x",
+    "uuid": "3.x",
+    "fancy-log": "1.3.x"
+  },
+  "homepage": "https://github.com/ThomasLeister/nodepki#readme",
+  "devDependencies": {}
 }
