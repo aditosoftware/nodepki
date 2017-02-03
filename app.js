@@ -11,6 +11,7 @@ var express = require('express');
 var app = express();
 
 var api = require('./api.js');
+var certdb = require('./certdb.js');
 
 
 
@@ -32,17 +33,20 @@ global.paths = {
 };
 
 
-// Start HTTP server
-var server = app.listen(global.config.server.port, function() {
-    var host = server.address().address;
-    var port = server.address().port;
+// Re-index cert database
+certdb.reindex().then(function(){
+    // Start HTTP server
+    var server = app.listen(global.config.server.port, function() {
+        var host = server.address().address;
+        var port = server.address().port;
 
-    console.log("Listening at http://%s:%s", host, port);
+        console.log("Listening at http://%s:%s", host, port);
+    });
+
+
+    // Register API paths
+    api.initAPI(app);
 });
-
-
-// Register API paths
-api.initAPI(app);
 
 
 // Export app var

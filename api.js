@@ -29,14 +29,22 @@ var initAPI = function(app) {
         certapi.certificate.request(req, res);
     });
 
+    app.put('/certificate/revoke/', function(req, res) {
+        certapi.certificate.revoke(req, res);
+    });
+
 
     /*
      * GET requests
      */
 
-    app.get('/certificate/:id/get/', function(req, res) {
-        console.log("Client is requesting certificate %s", req.params.id);
-        res.end("blablabla");
+    app.get('/certificate/:serial/get/', function(req, res) {
+        certapi.certificate.get(req, res);
+    });
+
+
+    app.get('/certificates/list/:filter/', function(req, res) {
+        certapi.certificates.list(req, res);
     });
 
 };
