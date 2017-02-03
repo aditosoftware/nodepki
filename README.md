@@ -14,11 +14,6 @@
 
 
 
-## Known bugs
-
-[none]
-
-
 ## Requirements
 
 * NodeJS
