@@ -199,7 +199,7 @@ certificate.get = function(req, res) {
                 respond({ success: false }, res);
             } else {
                 respond({
-                    success: false,
+                    success: true,
                     cert: certdata
                 }, res);
             }
