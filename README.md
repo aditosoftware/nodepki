@@ -40,7 +40,6 @@ npm install
 
 ## Configure NodePKI
 
-Set IP and Port to your needs and provide the CA passphrase you entered before.
 
 ```
 server:
@@ -48,7 +47,12 @@ server:
     port: 8081
 
 ca:
-    passphrase: MyIncrediblyLongAndRandomCAPassphrase
+    passphrase: blablabla
+
+ocsp:
+    ip: 192.168.42.53
+    port: 2560
+    passphrase: blablabla
 ```
 
 ## Start all the things!
@@ -77,4 +81,12 @@ openssl req -config mypki/openssl.cnf -key certkey.pem -new -sha256 -out cert.cs
 * Use nodepki-client to submit the request:
 ```
 nodepki-client request --csr cert.csr
+```
+
+
+## OCSP Query
+
+Check certificate validity, e.G. via:
+```
+openssl ocsp -url http://192.168.42.53:2560 -resp_text -CAfile ../nodepki/mypki/certs/ca.cert.pem -issuer ../nodepki/mypki/certs/ca.cert.pem -cert cert.pem
 ```

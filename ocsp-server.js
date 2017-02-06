@@ -15,7 +15,7 @@ var ocsp;
  */
 var startServer = function() {
     return new Promise(function(resolve, reject) {
-        console.log("Starting OCSP server")
+        log("Starting OCSP server ...")
 
         ocsp = spawn('openssl', [
             'ocsp',
@@ -25,8 +25,7 @@ var startServer = function() {
             '-index', 'index.txt',
             '-CA', 'certs/ca.cert.pem',
             '-rkey', 'private/ocsp.key.pem',
-            '-rsigner', 'certs/ocsp.cert.pem',
-            '-nrequest', '1'
+            '-rsigner', 'certs/ocsp.cert.pem'
          ], {
             cwd: "mypki/",
             detached: true,
@@ -34,7 +33,11 @@ var startServer = function() {
         });
 
         // Enter ocsp private key password
-        ocsp.stdin.write(global.config.ocsp.passphrase);
+        ocsp.stdin.write(global.config.ocsp.passphrase + '\n');
+
+        ocsp.on('data', function(data) {
+            console.log(data);
+        });
 
         ocsp.on('error', function(error) {
             console.log("OCSP server startup error: " + error);
