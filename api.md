@@ -30,3 +30,10 @@ GET http://localhost:8081/certificate/:serial/get/
 ```
 
 Where ":serial" is the serial of the certificat to be received.
+
+### Revoke issues certificate
+```
+PUT /certificate/revoke/
+```
+
+Body: { cert:<certdata> }
