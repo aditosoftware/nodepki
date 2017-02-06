@@ -63,12 +63,18 @@ nodejs app.js
 
 ## Request new certificate
 
-```cd ....```
 
-* Create certificate key: ```openssl genrsa -aes256 -out private/ca.key.pem 2048```
+* Create certificate key:
+```
+openssl genrsa -aes256 -out certkey.pem 2048
+```
 
 * Create certificate request:
-    ```openssl req -config intermediate/openssl.cnf -key intermediate/private/www.example.com.key.pem -new -sha256 -out intermediate/csr/www.example.com.csr.pem```
+```
+openssl req -config mypki/openssl.cnf -key certkey.pem -new -sha256 -out cert.csr
+```
 
-* Use certrequest.js to submit the request:
-    ```nodejs certrequest.js request.csr```
+* Use nodepki-client to submit the request:
+```
+nodepki-client request --csr cert.csr
+```
