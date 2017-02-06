@@ -112,11 +112,18 @@ certificate.revoke = function(req, res){
                         certdb.reindex().then(function(){
                             log.info("Successfully revoked certificate.");
 
-                            respond({
-                                success: true
-                            }, res);
+                            certdb.reindex().then(function(){
+                                log.info("Successfully re-indexed CertDB.");
 
-                            resolve();
+                                respond({
+                                    success: true
+                                }, res);
+
+                                resolve();
+                            })
+                            .catch(function(err){
+                                log.error("Could not re-index CertDB.");
+                            });
                         });
                     } else {
                         log.error("OpenSSL Error:\r\n", error);
@@ -175,7 +182,7 @@ certificates.list = function(req, res){
         if(filter == '') {
             result.push(certificate);
         } else {
-            if(certificate.validity === filter) {
+            if(certificate.state === filter) {
                 result.push(certificate);
             }
         }

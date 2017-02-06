@@ -26,7 +26,7 @@ var reindex = function() {
 
             if(columns !== null){
                 var certificate = {
-                    validity:   columns[1],
+                    state:   columns[1],
                     expirationtime:    columns[3],
                     revocationtime:     columns[5],
                     serial:     columns[7],
