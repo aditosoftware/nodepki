@@ -4,3 +4,8 @@ server:
 
 ca:
     passphrase: yyyy
+
+ocsp:
+    ip: 192.168.42.53
+    port: 2560
+    passphrase: yyyy

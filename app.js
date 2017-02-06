@@ -13,6 +13,7 @@ var app = express();
 
 var api = require('./api.js');
 var certdb = require('./certdb.js');
+var ocsp = require('./ocsp-server.js');
 
 
 
@@ -51,6 +52,29 @@ certdb.reindex().then(function(){
 }).catch(function(error){
     log.error("Could not initialize CertDB index: " + error);
 });
+
+
+// Start OCSP server
+ocsp.startServer()
+.then(function(){
+    log.info("OCSP-Server started.");
+})
+.catch(function(error){
+    log.error("Could not start OCSP server: " + error);
+});
+
+
+// STRG + C Event handler. (Shutdown Handler)
+process.on('SIGINT', function(){
+    log("Received SIGNINT.");
+
+    log("Stopping OCSP server ...");
+    ocsp.stopServer();
+
+    log("Bye!");
+    process.exit();
+})
+
 
 
 // Export app var
