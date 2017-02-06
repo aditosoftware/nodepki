@@ -31,7 +31,7 @@ function respond(res, resobj) {
  * Request method creates certificate from .csr file
  */
 certificate.request = function(req, res){
-    log.info("------\r\nCertificate request by %s ...", req.body.applicant);
+    log.info("Certificate request by %s ...", req.body.applicant);
     csr = req.body.csr;
 
     // Create temporary directory ...
@@ -101,10 +101,11 @@ certificate.revoke = function(req, res){
     new Promise(function(resolve, reject){
         // Write certificate to temporary file
 
-        fs.writeFile(tempdir + 'cert.pem', body.cert, function(err) {
+        fs.writeFile(tempdir + 'cert.pem', req.body.cert, function(err) {
             if(err === null) {
                 // Execute OpenSSL command
-                var revokecommand = util.format('openssl ca -config %sopenssl.cnf -revoke cert.pem', global.paths.pkipath);
+                log.info("Executing OpenSSL command.")
+                var revokecommand = util.format('openssl ca -config %sopenssl.cnf -revoke cert.pem -key "%s"', global.paths.pkipath, global.config.ca.passphrase);
 
                 exec(revokecommand, { cwd: tempdir }, function(error, stdout, stderr) {
                     if (error === null) {
@@ -208,12 +209,9 @@ certificate.get = function(req, res) {
         // Certificate file not found.
         respond({ success: false }, res);
     }
-
-
-
-
-    // Check if certificate file exists in
 };
+
+
 
 
 
