@@ -3,7 +3,6 @@
  */
 
 var spawn = require('child_process').spawn;
-var util = require('util');
 var log = require('fancy-log');
 
 var ocsp;
@@ -35,9 +34,7 @@ var startServer = function() {
 
         log("OCSP server is listening on " + global.config.ocsp.ip + ':' + global.config.ocsp.port);
 
-        ocsp.on('data', function(data) {
-            log.info(data);
-        });
+        resolve();
 
         ocsp.on('error', function(error) {
             log("OCSP server startup error: " + error);

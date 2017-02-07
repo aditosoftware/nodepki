@@ -20,6 +20,7 @@ var app         = express();
 var api         = require('./api.js');
 var certdb      = require('./certdb.js');
 var ocsp        = require('./ocsp-server.js');
+var crl         = require('./crl.js');
 
 
 
@@ -62,11 +63,16 @@ certdb.reindex().then(function(){
 // Start OCSP server
 ocsp.startServer()
 .then(function(){
-    log.info("OCSP-Server started.");
+    log.info("OCSP-Server is running");
 })
 .catch(function(error){
     log.error("Could not start OCSP server: " + error);
 });
+
+
+// Start CRL HTTP server and re-create CRL
+crl.createCRL();
+crl.startHTTPServer();
 
 
 

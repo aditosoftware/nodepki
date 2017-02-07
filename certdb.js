@@ -3,7 +3,8 @@
  */
 
 
-var log = require('fancy-log');
+var log     = require('fancy-log');
+var crl     = require('./crl.js');
 
 certificates = new Array();
 
@@ -46,6 +47,10 @@ var reindex = function() {
 
         lineReader.on('close', function() {
             log.info("Reindexing finished");
+
+            // Re-Create CRL
+            crl.createCRL();
+
             resolve();
         });
     });

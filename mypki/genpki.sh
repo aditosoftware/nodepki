@@ -48,6 +48,13 @@ openssl req \
 
 
 ###
+### Create CRL number file
+###
+
+echo 1000 > crlnumber
+
+
+###
 ### Creating OCSP signing key pair
 ###
 
