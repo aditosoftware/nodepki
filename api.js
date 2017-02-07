@@ -43,7 +43,7 @@ var initAPI = function(app) {
     });
 
 
-    app.get('/certificates/:state/', function(req, res) {
+    app.get('/certificates/list/:state/', function(req, res) {
         certapi.certificates.list(req, res);
     });
 
