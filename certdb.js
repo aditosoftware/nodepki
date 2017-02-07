@@ -1,7 +1,9 @@
 /*
- * DB driver for PKI index.txt
+ * Poor man's in-memory DB for quick certificate queries
  */
- var log = require('fancy-log');
+
+
+var log = require('fancy-log');
 
 certificates = new Array();
 
@@ -9,6 +11,9 @@ certificates = new Array();
 var regex = /([R,E,V])(\t)(.*)(\t)(.*)(\t)([\dA-F]*)(\t)(unknown)(\t)(.*)/;
 
 
+/*
+* Re-indexes OpenSSL index.txt file and stores datasets in array 'certificates'
+*/
 var reindex = function() {
     return new Promise(function(resolve, reject) {
         log.info("Reindexing CertDB ...");
@@ -47,6 +52,9 @@ var reindex = function() {
 }
 
 
+/*
+* Return all certificates
+*/
 var getIndex = function() {
     return certificates;
 }

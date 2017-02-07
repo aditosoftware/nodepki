@@ -1,10 +1,13 @@
 /**
  * Validator for API inputs
+ * Utilizes AJV
  */
+
+var log = require('fancy-log');
 
 var Ajv = require('ajv');
 var ajv = Ajv({allErrors: true});
-var log = require('fancy-log')
+
 
 var validator = {};
 
@@ -41,8 +44,6 @@ validator.checkAPI = function(schema, data) {
         return { success: false, errors: errors };
     }
 };
-
-
 
 
 module.exports = validator;

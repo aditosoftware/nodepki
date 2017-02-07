@@ -1,12 +1,10 @@
-/**
+/*
  * OCSP-Server via OpenSSL
  */
 
-// var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var util = require('util');
 var log = require('fancy-log');
-
 
 var ocsp;
 
@@ -35,17 +33,19 @@ var startServer = function() {
         // Enter ocsp private key password
         ocsp.stdin.write(global.config.ocsp.passphrase + '\n');
 
+        log("OCSP server is listening on " + global.config.ocsp.ip + ':' + global.config.ocsp.port);
+
         ocsp.on('data', function(data) {
-            console.log(data);
+            log.info(data);
         });
 
         ocsp.on('error', function(error) {
-            console.log("OCSP server startup error: " + error);
+            log("OCSP server startup error: " + error);
         });
 
         ocsp.on('close', function(code){
             if(code === null) {
-                log.info("OCSP server exited successfully.");
+                log("OCSP server exited successfully.");
             } else {
                 log.error("OCSP exited with code " + code);
             }

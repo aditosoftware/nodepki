@@ -1,29 +1,35 @@
 /*
- * nodepki is a certificate manager
+ * NodePKI
+ * ... a NodeJS-based OpenSSL PKI management server.
+ * Originally developed by Thomas Leister for ADITO GmbH.
+ * NodePKI is published under MIT License.
+ *
+ * NodePKI startup file
+ * Loads config, prepares CertDB database, starts OCSP server, initializes and starts HTTP server and API.
  */
 
-var exec = require('child_process').exec;
-var util = require('util');
-var fs = require('fs');
-var yaml = require('js-yaml');
-var log = require('fancy-log');
+var exec        = require('child_process').exec;
+var util        = require('util');
+var fs          = require('fs');
+var yaml        = require('js-yaml');
+var log         = require('fancy-log');
 
-var express = require('express');
-var app = express();
+var express     = require('express');
+var app         = express();
 
-var api = require('./api.js');
-var certdb = require('./certdb.js');
-var ocsp = require('./ocsp-server.js');
+var api         = require('./api.js');
+var certdb      = require('./certdb.js');
+var ocsp        = require('./ocsp-server.js');
 
 
 
-/* * * * * * * * *
- * Server start  *
- * * * * * * * * */
+/***************
+* Start server *
+***************/
 
 log.info("NodePKI is starting up ...");
 
-log.info("Reading config file ...");
+log.info("Reading config file config.yml ...");
 global.config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
 
 // Base Base path of the application
@@ -42,7 +48,7 @@ certdb.reindex().then(function(){
         var host = server.address().address;
         var port = server.address().port;
 
-        log.info("Listening on " + host + ":" + port);
+        log.info("HTTP API-server is listening on " + host + ":" + port);
     });
 
     // Register API paths
@@ -63,20 +69,27 @@ ocsp.startServer()
 });
 
 
-// STRG + C Event handler. (Shutdown Handler)
-process.on('SIGINT', function(){
-    log("Received SIGINT.");
 
+/*********************************
+* Server stop routine and events *
+*********************************/
+
+var stopServer = function() {
+    log("Received termination signal.");
     log("Stopping OCSP server ...");
     ocsp.stopServer();
 
     log("Bye!");
     process.exit();
-})
+};
+
+process.on('SIGINT', stopServer);
+process.on('SIGHUP', stopServer);
+process.on('SIGQUIT', stopServer);
 
 
 
-// Export app var
+// Export app variable
 module.exports = {
     app: app
 };
