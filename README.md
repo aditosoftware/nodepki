@@ -63,7 +63,7 @@ ocsp:
 Start your API server:
 
 ```
-nodejs app.js
+nodejs server.js
 ```
 
 
@@ -83,7 +83,7 @@ openssl req -config mypki/openssl.cnf -key certkey.pem -new -sha256 -out cert.cs
 
 * Use nodepki-client to submit the request:
 ```
-nodepki-client request --csr cert.csr
+nodejs client.js request --csr cert.csr
 ```
 
 
