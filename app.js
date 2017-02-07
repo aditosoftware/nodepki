@@ -17,7 +17,6 @@ var ocsp = require('./ocsp-server.js');
 
 
 
-
 /* * * * * * * * *
  * Server start  *
  * * * * * * * * */
@@ -66,7 +65,7 @@ ocsp.startServer()
 
 // STRG + C Event handler. (Shutdown Handler)
 process.on('SIGINT', function(){
-    log("Received SIGNINT.");
+    log("Received SIGINT.");
 
     log("Stopping OCSP server ...");
     ocsp.stopServer();

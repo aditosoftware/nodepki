@@ -14,6 +14,7 @@ var rmdir = require('rmdir');
 var log = require('fancy-log');
 
 var certdb = require('../certdb.js');
+var validator = require('../validator.js');
 
 var certificate = {};
 var certificates = {};
@@ -27,10 +28,55 @@ function respond(res, resobj) {
 }
 
 
+function errorresponse(error, res) {
+    var response = {
+        success: false,
+        errors: [
+            error
+        ]
+    };
+
+    res.end(JSON.stringify(response));
+}
+
+
+function wrongAPISchema(apierrors, res) {
+    var errors = []
+
+    apierrors.forEach(function(apierror) {
+        errors.push({ code: 100, message: apierror.message });
+    });
+
+    var resobj = {
+        success: false,
+        errors: errors
+    }
+
+    res.end(JSON.stringify(resobj))
+}
+
+
 /**
  * Request method creates certificate from .csr file
  */
 certificate.request = function(req, res){
+    // Validate user input
+    var schema = {
+        "properties": {
+            "csr": { "type": "string" },
+            "applicant": { "type": "string"}
+        },
+        "required": [ "csr", "applicant" ]
+    }
+
+    var check = validator.checkAPI(schema, req.body);
+
+    if(check.success === false) {
+        wrongAPISchema(check.errors, res);
+        return;
+    }
+
+
     log.info("Certificate request by %s ...", req.body.applicant);
     csr = req.body.csr;
 
@@ -63,21 +109,22 @@ certificate.request = function(req, res){
                                     resolve();
                                 } else {
                                     log.error("Could not read generated cert file:\r\n" + err);
-                                    respond({success: false}, res);
+                                    errorresponse({ code:101, message:"Internal server error."}, res);
                                     resolve();
                                 }
                             });
                         });
                     } else {
                         log.error("OpenSSL Error:\r\n", error);
-                        respond({success: false}, res);
                         log.error("Could not issue certificate. Maybe there was already a certificate created from the submitted .CSR?");
+
+                        errorresponse({ code:101, message:"Internal server error."}, res);
                         resolve();
                     }
                 });
             } else {
                 log.error("Could not write temporary request.csr file.\r\n Error: " + err);
-                respond({success: false}, res);
+                errorresponse({ code:101, message:"Internal server error."}, res);
                 resolve();
             }
         });
@@ -127,13 +174,13 @@ certificate.revoke = function(req, res){
                         });
                     } else {
                         log.error("OpenSSL Error:\r\n", error);
-                        respond({success: false}, res);
+                        errorresponse({ code:101, message:"Internal server error."}, res);
                         resolve();
                     }
                 });
             } else {
                 log.error("Failed to write certificate to temporary file.");
-                respond({success: false}, res);
+                errorresponse({ code:101, message:"Internal server error."}, res);
                 resolve();
             }
         });
@@ -151,11 +198,27 @@ certificate.revoke = function(req, res){
  * Lists all certificates
  */
 certificates.list = function(req, res){
-    log.info("Request: List all active certificates. Filter: " + req.params.filter);
+    // Validate user input
+    var schema = {
+        "properties": {
+            "state": { "type": "string" },
+        },
+        "required": [ "state" ]
+    }
+
+    var check = validator.checkAPI(schema, req.params);
+
+    if(check.success === false) {
+        wrongAPISchema(check.errors, res);
+        return;
+    }
+
+
+    log.info("Request: List all active certificates. Filter: " + req.params.state);
 
     var filter = '';
 
-    switch(req.params.filter) {
+    switch(req.params.state) {
         case 'all':
             filter = '';
             break;
@@ -196,6 +259,22 @@ certificates.list = function(req, res){
 
 
 certificate.get = function(req, res) {
+    // Validate user input
+    var schema = {
+        "properties": {
+            "serial": { "type": "string" },
+        },
+        "required": [ "serial" ]
+    }
+
+    var check = validator.checkAPI(schema, req.params);
+
+    if(check.success === false) {
+        wrongAPISchema(check.errors, res);
+        return;
+    }
+
+
     log.info("Client is requesting certificate " + req.params.serial);
 
     var certfile = global.paths.pkipath + "newcerts/" + req.params.serial + ".pem";
@@ -204,7 +283,7 @@ certificate.get = function(req, res) {
         fs.readFile(certfile, 'utf8', function(err, certdata){
             if(err) {
                 log.error("Could not read certificate file.");
-                respond({ success: false }, res);
+                errorresponse({ code:101, message:"Internal server error."}, res);
             } else {
                 respond({
                     success: true,
@@ -214,7 +293,8 @@ certificate.get = function(req, res) {
         });
     } else {
         // Certificate file not found.
-        respond({ success: false }, res);
+        log.error("Certificate file not found.")
+        errorresponse({ code:101, message:"Internal server error."}, res);
     }
 };
 

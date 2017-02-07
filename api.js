@@ -25,11 +25,11 @@ var initAPI = function(app) {
      * PUT requests
      */
 
-    app.put('/certificate/request/', function(req, res) {
+    app.put('/certificates/request/', function(req, res) {
         certapi.certificate.request(req, res);
     });
 
-    app.put('/certificate/revoke/', function(req, res) {
+    app.put('/certificates/revoke/', function(req, res) {
         certapi.certificate.revoke(req, res);
     });
 
@@ -38,12 +38,12 @@ var initAPI = function(app) {
      * GET requests
      */
 
-    app.get('/certificate/:serial/get/', function(req, res) {
+    app.get('/certificates/:serial/', function(req, res) {
         certapi.certificate.get(req, res);
     });
 
 
-    app.get('/certificates/list/:filter/', function(req, res) {
+    app.get('/certificates/:state/', function(req, res) {
         certapi.certificates.list(req, res);
     });
 
