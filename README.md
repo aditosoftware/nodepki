@@ -45,17 +45,43 @@ npm install
 
 
 ```
+###
+### Server config: IP-Address and port to listen to.
+###
+
 server:
     ip: 192.168.42.53
     port: 8081
 
+
+###
+### CA config: Passphrase for CA Key
+###
+
 ca:
-    passphrase: blablabla
+    passphrase: pass
+
+
+###
+### OCSP server config:
+### IP-Address and port to listen to,
+### Passphrase used to encrypt the OCSP signign key.
+###
 
 ocsp:
     ip: 192.168.42.53
     port: 2560
-    passphrase: blablabla
+    passphrase: pass
+
+
+###
+### CRL HTTP server config
+###
+
+crl:
+    ip: 192.168.42.53
+    port: 2561
+    baseurl: http://pki.adito.de:2561
 ```
 
 ## Start all the things!
