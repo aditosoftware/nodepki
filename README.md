@@ -7,10 +7,12 @@
 
 ## Implemented Features
 
-* Auto-create a PKI
-* Request a new signed certificate via certrequest.js client
+* Auto-create a PKI via Bash script
+* Request a new signed certificate via nodepki-client
 * List available certificates
 * Download issued certificate files (without key!)
+* Revoke issued certificate
+* OSCP server
 
 
 
