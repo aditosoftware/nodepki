@@ -117,6 +117,8 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
+crlDistributionPoints = URI:{crl_url}
+authorityInfoAccess = OCSP;URI:{ocsp_url}
 
 [ crl_ext ]
 # Extension for CRLs (`man x509v3_config`).

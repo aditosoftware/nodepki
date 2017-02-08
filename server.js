@@ -31,11 +31,11 @@ var app         = express();
 log.info("NodePKI is starting up ...");
 
 console.log(figlet.textSync('NodePKI', {}));
-console.log("  By ADITO Software GmbH\n\n")
+console.log("  By ADITO Software GmbH\n\n");
 
 
 /*
- * Make sure there is a config file confiy.yml
+ * Make sure there is a config file config.yml
  */
 if(fs.existsSync('config.yml')) {
     log.info("Reading config file config.yml ...");
@@ -51,11 +51,24 @@ if(fs.existsSync('config.yml')) {
 ***                     and restart NodePKI.                       ***\n\
 **********************************************************************");
 
-    log("Server will now quit.");
+    log("Server will quit now.");
     process.exit();
 }
 
 
+/*
+ * Check if there is a PKI directory with all the OpenSSL contents.
+ */
+
+fs.ensureDir('mypki');
+if(fs.existsSync('mypki/openssl.cnf') === false) {
+    log("There is no PKI available. Please generate the content of mypki by executing 'nodejs genpki.js'.");
+    process.exit();
+}
+
+
+// Ensure tmp dir
+fs.ensureDir('tmp');
 
 // Base Base path of the application
 global.paths = {

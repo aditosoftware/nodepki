@@ -11,15 +11,9 @@ node_modules/
 
 config.yml
 
-
 ##
-## Ignore everything from mypki except for some files
+## Ignore directories to be generated dynamically.
 ##
 
-mypki/*
-!mypki/openssl.cnf.tpl
-!mypki/genpki.sh
-
-tmp/*
-
-validatortest.js
+mypki/
+tmp/
