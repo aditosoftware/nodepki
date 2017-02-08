@@ -36,12 +36,12 @@ npm install
 
 ### Configure NodePKI
 
-There is an example config file "config.yml.default" which can be copied to "config.yml". Change config.yml to fit your environment.
+There is an example config file "config.yml.default" which can be copied to "config.yml". Change config.yml to fit your environment. The passwords defined in config.yml will be used to create the PKI.
 
 ### Create OpenSSL X.509 PKI
 
 ```
-./mypki/genpki.sh
+nodejs genpki.js
 ```
 
 ## Start all the things!
