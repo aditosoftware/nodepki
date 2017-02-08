@@ -6,7 +6,7 @@
  */
 
 var util = require('util');
-var fs = require('fs');
+var fs = require('fs-extra');
 var exec = require('child_process').exec;
 
 const uuidV4 = require('uuid/v4');
