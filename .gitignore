@@ -6,6 +6,13 @@ node_modules/
 
 
 ##
+## Ignore custom config
+##
+
+config.yml
+
+
+##
 ## Ignore everything from mypki except for some files
 ##
 

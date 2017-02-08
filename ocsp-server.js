@@ -32,7 +32,7 @@ var startServer = function() {
         // Enter ocsp private key password
         ocsp.stdin.write(global.config.ocsp.passphrase + '\n');
 
-        log("OCSP server is listening on " + global.config.ocsp.ip + ':' + global.config.ocsp.port);
+        log(">>>>>> OCSP server is listening on " + global.config.ocsp.ip + ':' + global.config.ocsp.port + " <<<<<<");
 
         resolve();
 

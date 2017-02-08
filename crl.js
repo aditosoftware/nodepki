@@ -49,7 +49,7 @@ var startHTTPServer = function() {
         var host = server.address().address;
         var port = server.address().port;
 
-        log.info("CRL HTTP server is listening on " + host + ":" + port);
+        log.info(">>>>>> CRL HTTP server is listening on " + host + ":" + port + " <<<<<<");
     });
 }
 

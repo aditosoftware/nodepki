@@ -10,18 +10,18 @@
 
 var exec        = require('child_process').exec;
 var util        = require('util');
-var fs          = require('fs');
+var fs          = require('fs-extra');
 var yaml        = require('js-yaml');
 var log         = require('fancy-log');
-
 var express     = require('express');
-var app         = express();
+var figlet      = require('figlet');
 
 var api         = require('./api.js');
 var certdb      = require('./certdb.js');
 var ocsp        = require('./ocsp-server.js');
 var crl         = require('./crl.js');
 
+var app         = express();
 
 
 /***************
@@ -30,8 +30,32 @@ var crl         = require('./crl.js');
 
 log.info("NodePKI is starting up ...");
 
-log.info("Reading config file config.yml ...");
-global.config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
+console.log(figlet.textSync('NodePKI', {}));
+console.log("  By ADITO Software GmbH\n\n")
+
+
+/*
+ * Make sure there is a config file confiy.yml
+ */
+if(fs.existsSync('config.yml')) {
+    log.info("Reading config file config.yml ...");
+    global.config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
+} else {
+    // There is no config file yet. Create one from config.yml.default and quit server.
+    log("No custom config file 'config.yml' found.")
+    fs.copySync('config.yml.default', 'config.yml');
+    log("Default config file was copied to config.yml.");
+    console.log("\
+**********************************************************************\n\
+***   Please customize config.yml according to your environment    ***\n\
+***                     and restart NodePKI.                       ***\n\
+**********************************************************************");
+
+    log("Server will now quit.");
+    process.exit();
+}
+
+
 
 // Base Base path of the application
 global.paths = {
@@ -49,7 +73,7 @@ certdb.reindex().then(function(){
         var host = server.address().address;
         var port = server.address().port;
 
-        log.info("HTTP API-server is listening on " + host + ":" + port);
+        log.info(">>>>>> HTTP API-server is listening on " + host + ":" + port + " <<<<<<");
     });
 
     // Register API paths
@@ -70,8 +94,7 @@ ocsp.startServer()
 });
 
 
-// Start CRL HTTP server and re-create CRL
-crl.createCRL();
+// Start CRL HTTP server. CRL was created before by CertDB re-indexing.
 crl.startHTTPServer();
 
 

@@ -26,7 +26,8 @@
     "body-parser": "1.x",
     "uuid": "3.x",
     "fancy-log": "1.x",
-    "ajv": "4.x"
+    "ajv": "4.x",
+    "fs-extra": "2.0.x"
   },
   "homepage": "https://github.com/ThomasLeister/nodepki#readme",
   "devDependencies": {}
