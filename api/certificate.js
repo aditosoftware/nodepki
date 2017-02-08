@@ -10,7 +10,6 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 
 const uuidV4 = require('uuid/v4');
-var rmdir = require('rmdir');
 var log = require('fancy-log');
 
 var certdb = require('../certdb.js');
@@ -131,7 +130,7 @@ certificate.request = function(req, res){
     }).then(function(){
         // Clean up... Remove temporary files
         if(fs.existsSync(tempdir)){
-            rmdir(tempdir);
+            fs.remove(tempdir, function(){});
         }
     });
 };
@@ -187,7 +186,7 @@ certificate.revoke = function(req, res){
     }).then(function(){
         // Clean up... Remove temporary files
         if(fs.existsSync(tempdir)){
-            rmdir(tempdir);
+            fs.remove(tempdir, function(){});
         }
     });
 };
