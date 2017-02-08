@@ -9,6 +9,7 @@ server:
 
 ###
 ### CA config: Passphrase for CA Key
+### Note: Password must be >= 4 characters long!
 ###
 
 ca:
@@ -20,6 +21,7 @@ ca:
 ### IP-Address and port to listen to,
 ### Passphrase used to encrypt the OCSP signing key.
 ### Password and URL are used to generate PKI. If you want to change these settings, you have to re-create your pki!
+### Note: Password must be >= 4 characters long!
 ###
 
 ocsp:
