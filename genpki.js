@@ -115,14 +115,14 @@ var genOCSP = function() {
             cwd: pkidir
         }, function() {
             // Root certificate
-            createocspcsr = exec('openssl req -config openssl.cnf -key private/ocsp.key.pem -new -x509 -sha256 -out ocsp.csr -passin pass:' + global.config.ca.passphrase + ' -batch', {
+            createocspcsr = exec('openssl req -config openssl.cnf -key private/ocsp.key.pem -new -sha256 -out ocsp.csr -passin pass:' + global.config.ca.passphrase + ' -subj "/CN=OCSP" -batch', {
                 cwd: pkidir
             }, function() {
                 createocspcert = exec('openssl ca -config openssl.cnf -extensions oscp -days 3650 -notext -md sha256 -in ocsp.csr -out certs/ocsp.cert.pem -passin pass:' + global.config.ca.passphrase + ' -batch', {
                     cwd: pkidir
                 }, function() {
                     // Remove ocsp.csr
-                    fs.removeSync(pkidir + 'ocsp.csr');
+                    // fs.removeSync(pkidir + 'ocsp.csr');
                     resolve();
                 });
             });
