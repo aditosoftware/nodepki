@@ -43,7 +43,7 @@ if(fs.existsSync('config.yml')) {
 } else {
     // There is no config file yet. Create one from config.yml.default and quit server.
     log("No custom config file 'config.yml' found.")
-    fs.copySync('config.yml.default', 'config.yml');
+    fs.copySync('config.default.yml', 'config.yml');
     log("Default config file was copied to config.yml.");
     console.log("\
 **********************************************************************\n\
@@ -61,7 +61,7 @@ if(fs.existsSync('config.yml')) {
  */
 
 fs.ensureDir('mypki');
-if(fs.existsSync('mypki/openssl.cnf') === false) {
+if(fs.existsSync('mypki/created') === false) {
     log("There is no PKI available. Please generate the content of mypki by executing 'nodejs genpki.js'.");
     process.exit();
 }

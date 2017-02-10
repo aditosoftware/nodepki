@@ -9,11 +9,31 @@ server:
 
 ###
 ### CA config: Passphrase for CA Key
-### Note: Password must be >= 4 characters long!
 ###
 
 ca:
-    passphrase: yyyy
+    root:
+        passphrase: yyyy
+        days: 3650
+        country: DE
+        state: Bayern
+        locality: Geisenhausen
+        organization: ADITO Software GmbH
+        commonname: Root CA
+    intermediate:
+        passphrase: yyyy
+        days: 3650
+        country: DE
+        state: Bayern
+        locality: Geisenhausen
+        organization: ADITO Software GmbH
+        commonname: Intermediate CA
+        ocsp:
+            passphrase: yyyy
+            country: DE
+            commonname: ocsp.adito.local
+        crl:
+            url: http://crl.adito.local/crl.pem
 
 
 ###
@@ -21,14 +41,11 @@ ca:
 ### IP-Address and port to listen to,
 ### Passphrase used to encrypt the OCSP signing key.
 ### Password and URL are used to generate PKI. If you want to change these settings, you have to re-create your pki!
-### Note: Password must be >= 4 characters long!
 ###
 
 ocsp:
     ip: 192.168.42.53
     port: 2560
-    passphrase: yyyy
-    url: http://ocsp.adito.local
 
 
 ###
@@ -39,4 +56,3 @@ ocsp:
 crl:
     ip: 192.168.42.53
     port: 2561
-    url: http://crl.adito.local/crl.pem

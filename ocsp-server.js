@@ -30,7 +30,7 @@ var startServer = function() {
         });
 
         // Enter ocsp private key password
-        ocsp.stdin.write(global.config.ocsp.passphrase + '\n');
+        ocsp.stdin.write(global.config.ca.intermediate.ocsp.passphrase + '\n');
 
         log(">>>>>> OCSP server is listening on " + global.config.ocsp.ip + ':' + global.config.ocsp.port + " <<<<<<");
 

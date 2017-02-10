@@ -20,13 +20,13 @@ var createCRL = function() {
       '-gencrl',
       '-out', 'crl/crl.pem'
     ], {
-      cwd: "mypki/",
+      cwd: "mypki/intermediate",
       shell: true,
       detached: true
     });
 
     // Enter ocsp private key password
-    crl.stdin.write(global.config.ca.passphrase + '\n');
+    crl.stdin.write(global.config.ca.intermediate.passphrase + '\n');
 
     crl.on('error', function(error) {
         log("Error during crl generation: " + error);
@@ -43,7 +43,7 @@ var createCRL = function() {
 
 
 var startHTTPServer = function() {
-    app.use(express.static(global.paths.pkipath + 'crl'));
+    app.use(express.static(global.paths.pkipath + 'intermediate/crl'));
 
     var server = app.listen(global.config.crl.port, global.config.crl.ip, function() {
         var host = server.address().address;

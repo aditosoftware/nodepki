@@ -35,11 +35,10 @@ if(fs.existsSync('config.yml')) {
 
 
 
-
 var PKIExists = function() {
         fs.ensureDir('mypki');
 
-        if(fs.existsSync('mypki/openssl.cnf')) {
+        if(fs.existsSync('mypki/created')) {
             return true;
         } else {
             return false;
@@ -47,59 +46,101 @@ var PKIExists = function() {
 };
 
 
-var prepareDirs = function() {
-    log(">>> Creating PKI directories");
+
+var createFileStructure = function() {
+    log(">>> Creating CA file structure")
 
     return new Promise(function(resolve, reject) {
-        fs.ensureDir(pkidir + 'certs');
-        fs.ensureDir(pkidir + 'crl');
-        fs.ensureDir(pkidir + 'newcerts');
-        fs.ensureDir(pkidir + 'private');
+        fs.ensureDirSync('mypki');
 
-        fs.writeFileSync(pkidir + 'index.txt', '', 'utf8');
-        fs.writeFileSync(pkidir + 'serial', '1000', 'utf8');
-        fs.writeFileSync(pkidir + 'crlnumber', '1000', 'utf8');
+        /*
+         * Prepare root/ dir
+         */
+
+        fs.ensureDirSync(pkidir + 'root');
+
+        fs.ensureDirSync(pkidir + 'root/certs');
+        fs.ensureDirSync(pkidir + 'root/crl');
+
+        fs.writeFileSync(pkidir + 'root/index.txt', '', 'utf8');
+        fs.writeFileSync(pkidir + 'root/serial', '1000', 'utf8');
+
+        // Customize openssl.cnf and copy to root/
+
+        openssl_root = fs.readFileSync('pkitemplate/openssl_root.cnf.tpl', 'utf8');
+        openssl_root = openssl_root.replace(/{basedir}/g, pkidir + 'root');
+        openssl_root = openssl_root.replace(/{days}/g, global.config.ca.root.days);
+        openssl_root = openssl_root.replace(/{country}/g, global.config.ca.root.country);
+        openssl_root = openssl_root.replace(/{state}/g, global.config.ca.root.state);
+        openssl_root = openssl_root.replace(/{locality}/g, global.config.ca.root.locality);
+        openssl_root = openssl_root.replace(/{organization}/g, global.config.ca.root.organization);
+        openssl_root = openssl_root.replace(/{commonname}/g, global.config.ca.root.commonname);
+
+        fs.writeFileSync(pkidir + 'root/openssl.cnf', openssl_root);
+
+
+
+        /*
+         * Prepare intermediate/ dir
+         */
+
+        fs.ensureDirSync(pkidir + 'intermediate');
+
+        fs.ensureDirSync(pkidir + 'intermediate/certs');
+        fs.ensureDirSync(pkidir + 'intermediate/crl');
+
+        fs.writeFileSync(pkidir + 'intermediate/index.txt', '', 'utf8');
+        fs.writeFileSync(pkidir + 'intermediate/serial', '1000', 'utf8');
+        fs.writeFileSync(pkidir + 'intermediate/crlnumber', '1000', 'utf8');
+
+        // Customize openssl.cnf and copy to root/
+
+        openssl_intermediate = fs.readFileSync('pkitemplate/openssl_intermediate.cnf.tpl', 'utf8');
+        openssl_intermediate = openssl_intermediate.replace(/{basedir}/g, pkidir + 'intermediate');
+        openssl_intermediate = openssl_intermediate.replace(/{days}/g, global.config.ca.intermediate.days);
+        openssl_intermediate = openssl_intermediate.replace(/{country}/g, global.config.ca.intermediate.country);
+        openssl_intermediate = openssl_intermediate.replace(/{state}/g, global.config.ca.intermediate.state);
+        openssl_intermediate = openssl_intermediate.replace(/{locality}/g, global.config.ca.intermediate.locality);
+        openssl_intermediate = openssl_intermediate.replace(/{organization}/g, global.config.ca.intermediate.organization);
+        openssl_intermediate = openssl_intermediate.replace(/{commonname}/g, global.config.ca.intermediate.commonname);
+        openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, 'http://' + global.config.ca.intermediate.ocsp.commonname);
+
+        fs.writeFileSync(pkidir + 'intermediate/openssl.cnf', openssl_intermediate);
+
+
+        /*
+         * Prepare intermediate/ocsp dir
+         */
+        fs.ensureDirSync(pkidir + 'intermediate/ocsp');
+
+        openssl_intermediate_ocsp = fs.readFileSync('pkitemplate/openssl_ocsp.cnf.tpl', 'utf8');
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{state}/g, global.config.ca.intermediate.state);
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{country}/g, global.config.ca.intermediate.country);
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{locality}/g, global.config.ca.intermediate.locality);
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{organization}/g, global.config.ca.intermediate.organization);
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{commonname}/g, global.config.ca.intermediate.ocsp.commonname);
+
+        fs.writeFileSync(pkidir + 'intermediate/ocsp/openssl.cnf', openssl_intermediate_ocsp);
 
         resolve();
     });
 };
 
 
-var createOpenSSLConf = function() {
-    log(">>> Creating OpenSSL config");
+
+var createRootCA = function() {
+    log(">>> Creating Root CA");
 
     return new Promise(function(resolve, reject) {
-        // Read openssl.cnf.tpl
-        openssl_conf = fs.readFileSync('openssl.cnf.tpl', 'utf8');
-
-        openssl_basedir = pkidir.substring(0, pkidir.length - 1);  // remove trailing slash
-
-        // Replace placeholders
-        openssl_conf = openssl_conf.replace(/{basedir}/g, openssl_basedir);
-
-        openssl_conf = openssl_conf.replace(/{crl_url}/g, global.config.crl.url);
-        openssl_conf = openssl_conf.replace(/{ocsp_url}/g, global.config.ocsp.url);
-
-        // Write config to file
-        fs.writeFileSync(pkidir + 'openssl.cnf', openssl_conf);
-
-        resolve();
-    });
-};
-
-
-var genRootCA = function() {
-    log(">>> Generating Root CA");
-
-    return new Promise(function(resolve, reject) {
-        // Root CA key
-        createrootkey = exec('openssl genrsa -aes256 -passout pass:' + global.config.ca.passphrase + ' -out private/ca.key.pem 4096', {
-            cwd: pkidir
+        // Create root key
+        exec('openssl genrsa -aes256 -out root.key.pem -passout pass:' + global.config.ca.root.passphrase + ' 4096', {
+            cwd: pkidir + 'root'
         }, function() {
-            // Root certificate
-            createrootca = exec('openssl req -config openssl.cnf -key private/ca.key.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out certs/ca.cert.pem -passin pass:' + global.config.ca.passphrase + ' -batch', {
-                cwd: pkidir
+            // Create Root certificate
+            exec('openssl req -config openssl.cnf -key root.key.pem -new -x509 -days ' + global.config.ca.root.days + ' -sha256 -extensions v3_ca -out root.cert.pem -passin pass:' + global.config.ca.root.passphrase, {
+                cwd: pkidir + 'root'
             }, function() {
+                // cont
                 resolve();
             });
         });
@@ -107,47 +148,84 @@ var genRootCA = function() {
 };
 
 
-var genOCSP = function() {
-    log(">>> Generating OCSP certs");
+
+var createIntermediateCA = function() {
+    log(">>> Creating Intermediate CA");
 
     return new Promise(function(resolve, reject) {
-        createocspkey = exec('openssl genrsa -aes256 -passout pass:' + global.config.ocsp.passphrase + ' -out private/ocsp.key.pem 4096', {
-            cwd: pkidir
+        // Create intermediate key
+        exec('openssl genrsa -aes256 -out intermediate.key.pem -passout pass:' + global.config.ca.intermediate.passphrase + ' 4096', {
+            cwd: pkidir + 'intermediate'
         }, function() {
-            // Root certificate
-            createocspcsr = exec('openssl req -config openssl.cnf -key private/ocsp.key.pem -new -sha256 -out ocsp.csr -passin pass:' + global.config.ca.passphrase + ' -subj "/CN=OCSP" -batch', {
-                cwd: pkidir
+            // Create intermediate certificate request
+            exec('openssl req -config openssl.cnf -new -sha256 -key intermediate.key.pem -out intermediate.csr.pem -passin pass:' + global.config.ca.intermediate.passphrase, {
+                cwd: pkidir + 'intermediate'
             }, function() {
-                createocspcert = exec('openssl ca -config openssl.cnf -extensions oscp -days 3650 -notext -md sha256 -in ocsp.csr -out certs/ocsp.cert.pem -passin pass:' + global.config.ca.passphrase + ' -batch', {
-                    cwd: pkidir
+                // Create intermediate certificate
+                exec('openssl ca -config ../root/openssl.cnf -extensions v3_intermediate_ca -days ' + global.config.ca.intermediate.days + ' -notext -md sha256 -in intermediate.csr.pem -out intermediate.cert.pem -passin pass:' + global.config.ca.root.passphrase + ' -batch', {
+                    cwd: pkidir + 'intermediate'
                 }, function() {
-                    // Remove ocsp.csr
-                    // fs.removeSync(pkidir + 'ocsp.csr');
+                    // Remove intermediate.csr.pem file
+                    fs.removeSync(pkidir + 'intermediate/intermediate.csr.pem');
+
+                    // Create CA chain file
+                    // TO BE DONE
+
                     resolve();
                 });
             });
         });
-    })
+    });
 };
 
 
 
-var createPKI = function() {
-    if(PKIExists() === false) {
-        // Create directories and files
-        prepareDirs().then(function() {
-            createOpenSSLConf().then(function() {
-                genRootCA().then(function() {
-                    genOCSP().then(function() {
-                        log("====== PKI generation successful! Please make a backup of the 'mypki' directory. ======");
-                    })
-                    .catch(function(err) {
-                        log("Error: " + err)
-                    });
+var createOCSPKeys = function() {
+    log(">>> Creating OCSP Keys")
+
+    return new Promise(function(resolve, reject) {
+        // Create key
+        exec('openssl genrsa -aes256 -out ocsp.key.pem -passout pass:' + global.config.ca.intermediate.ocsp.passphrase + ' 4096', {
+            cwd: pkidir + 'intermediate/ocsp'
+        }, function() {
+            // Create request
+            exec('openssl req -config openssl.cnf -new -sha256 -key ocsp.key.pem -passin pass:' + global.config.ca.intermediate.ocsp.passphrase + ' -out ocsp.csr.pem', {
+                cwd: pkidir + 'intermediate/ocsp'
+            }, function() {
+                // Create certificate
+                exec('openssl ca -config ../openssl.cnf -extensions ocsp -days 3650 -notext -md sha256 -in ocsp.csr.pem -out ocsp.cert.pem -passin pass:' + global.config.ca.intermediate.passphrase + ' -batch', {
+                    cwd: pkidir + 'intermediate/ocsp'
+                }, function() {
+                    fs.removeSync(pkidir + 'intermediate/ocsp/ocsp.csr.pem');
+
+                    resolve();
+                });
+            });
+        });
+    });
+};
+
+
+
+
+/**
+ * Start all the things!
+ */
+if(PKIExists() === false) {
+    log("There is no PKI. Creating ...")
+
+    createFileStructure().then(function() {
+        createRootCA().then(function() {
+            createIntermediateCA().then(function() {
+                createOCSPKeys().then(function() {
+                    log("### Finished!")
+
+                    // Tag mypki as ready.
+                    fs.writeFileSync(pkidir + 'created', '', 'utf8');
                 })
                 .catch(function(err) {
                     log("Error: " + err)
-                })
+                });
             })
             .catch(function(err) {
                 log("Error: " + err)
@@ -155,16 +233,11 @@ var createPKI = function() {
         })
         .catch(function(err) {
             log("Error: " + err)
-        });
-    } else {
-        log("There is an existing PKI in mypki/. Remove mypki/ directory to continue.");
-    }
-};
-
-
-createPKI();
-
-
-module.exports = {
-    PKIExists: PKIExists
+        })
+    })
+    .catch(function(err) {
+        log("Error: " + err)
+    });
+} else {
+    log("Error: There is already a PKI directory mypki")
 }

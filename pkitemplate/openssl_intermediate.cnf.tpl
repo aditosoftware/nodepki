@@ -20,14 +20,14 @@ certificate       = $dir/intermediate.cert.pem
 crlnumber         = $dir/crlnumber
 crl               = $dir/crl/intermediate.crl.pem
 crl_extensions    = crl_ext
-default_crl_days  = 30
+default_crl_days  = 7
 
 # SHA-1 is deprecated, so use SHA-2 instead.
 default_md        = sha256
 
 name_opt          = ca_default
 cert_opt          = ca_default
-default_days      = 375
+default_days      = {days}
 preserve          = no
 policy            = policy_loose
 
@@ -56,11 +56,11 @@ x509_extensions     = v3_ca
 prompt = no
 
 [ req_distinguished_name ]
-C=DE
-ST=Deutschland
-L=Geisenhausen
-O=Adito Software GmbH
-CN=IntermediateCA
+C={country}
+ST={state}
+L={locality}
+O={organization}
+CN={commonname}
 
 
 
@@ -96,7 +96,7 @@ authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 crlDistributionPoints = URI:http://example.com/intermediate.crl.pem
-authorityInfoAccess = OCSP;URI:http://ocsp.example.com
+authorityInfoAccess = OCSP;URI:{ocspurl}
 
 
 ### For CRLs
