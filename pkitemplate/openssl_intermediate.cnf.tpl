@@ -30,6 +30,7 @@ cert_opt          = ca_default
 default_days      = {days}
 preserve          = no
 policy            = policy_loose
+unique_subject    = no
 
 
 [ policy_loose ]

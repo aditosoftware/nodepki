@@ -88,7 +88,7 @@ certificate.request = function(req, res){
         fs.writeFile(tempdir + 'request.csr', csr, function(err) {
             if(err === null) {
                 // OpenSSL command template
-                var signcommand = util.format('openssl ca -batch -config %s/intermediate/openssl.cnf -extensions server_cert -days 1 -notext -md sha256 -in request.csr -key "%s" -out cert.pem', global.paths.pkipath, global.config.ca.intermediate.passphrase);
+                var signcommand = util.format('openssl ca -batch -config %sintermediate/openssl.cnf -extensions server_cert -days 1 -notext -md sha256 -in request.csr -key "%s" -out cert.pem', global.paths.pkipath, global.config.ca.intermediate.passphrase);
 
                 // Execute Linux Shell command
                 exec(signcommand, { cwd: tempdir }, function(error, stdout, stderr) {
