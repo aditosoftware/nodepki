@@ -77,5 +77,5 @@ nodejs client.js request --csr cert.csr
 
 Check certificate validity, e.G. via:
 ```
-openssl ocsp -url http://192.168.42.53:2560 -resp_text -CAfile ../nodepki/mypki/certs/ca.cert.pem -issuer ../nodepki/mypki/certs/ca.cert.pem -cert cert.pem
+openssl ocsp -url http://192.168.42.53:2560 -resp_text -CAfile ../../nodepki/mypki/intermediate/ca-chain.cert.pem -issuer ../../nodepki/mypki/intermediate/intermediate.cert.pem -cert cert.pem
 ```

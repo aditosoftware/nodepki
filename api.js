@@ -10,6 +10,7 @@ var bodyparser  = require('body-parser');
 
 // Custom modules
 var certapi     = require('./api/certificate.js');
+var caapi        = require('./api/ca.js');
 
 
 /**
@@ -44,6 +45,10 @@ var initAPI = function(app) {
 
     app.get('/certificates/list/:state/', function(req, res) {
         certapi.certificates.list(req, res);
+    });
+
+    app.get('/ca/certs/:ca/:chain/', function(req, res) {
+        caapi.cert.get(req, res);
     });
 
 };

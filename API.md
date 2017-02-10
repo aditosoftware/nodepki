@@ -38,6 +38,15 @@ Valid :state values:
     Response body: { success: <bool> }
 
 
+### Get CA certificates
+
+    GET /ca/certs/root/
+    GET /ca/certs/intermediate/
+    GET /ca/certs/intermediate/chain/
+
+    Response body: { success: true, cert: <cert> }
+
+
 ## Errors
 
 Error responses are send with HTTP error headers.
