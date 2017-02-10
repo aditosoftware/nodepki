@@ -20,11 +20,11 @@ var startServer = function() {
             '-text',
             '-sha256',
             '-index', 'index.txt',
-            '-CA', 'certs/ca.cert.pem',
-            '-rkey', 'private/ocsp.key.pem',
-            '-rsigner', 'certs/ocsp.cert.pem'
+            '-CA', 'ca-chain.cert.pem',
+            '-rkey', 'ocsp/ocsp.key.pem',
+            '-rsigner', 'ocsp/ocsp.cert.pem'
          ], {
-            cwd: "mypki/",
+            cwd: "mypki/intermediate",
             detached: true,
             shell: true
         });

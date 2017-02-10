@@ -169,7 +169,12 @@ var createIntermediateCA = function() {
                     fs.removeSync(pkidir + 'intermediate/intermediate.csr.pem');
 
                     // Create CA chain file
-                    // TO BE DONE
+                    // Read intermediate
+                    intermediate = fs.readFileSync(pkidir + 'intermediate/intermediate.cert.pem', 'utf8');
+                    // Read root cert
+                    root = fs.readFileSync(pkidir + 'root/root.cert.pem', 'utf8');
+                    cachain = intermediate + '\n\n' + root;
+                    fs.writeFileSync(pkidir + 'intermediate/ca-chain.cert.pem', cachain);
 
                     resolve();
                 });

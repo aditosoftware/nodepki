@@ -88,7 +88,7 @@ certificate.request = function(req, res){
         fs.writeFile(tempdir + 'request.csr', csr, function(err) {
             if(err === null) {
                 // OpenSSL command template
-                var signcommand = util.format('openssl ca -batch -config %sopenssl.cnf -extensions server_cert -days 1 -notext -md sha256 -in request.csr -key "%s" -out cert.pem', global.paths.pkipath, global.config.ca.passphrase);
+                var signcommand = util.format('openssl ca -batch -config %s/intermediate/openssl.cnf -extensions server_cert -days 1 -notext -md sha256 -in request.csr -key "%s" -out cert.pem', global.paths.pkipath, global.config.ca.intermediate.passphrase);
 
                 // Execute Linux Shell command
                 exec(signcommand, { cwd: tempdir }, function(error, stdout, stderr) {
@@ -151,7 +151,7 @@ certificate.revoke = function(req, res){
             if(err === null) {
                 // Execute OpenSSL command
                 log.info("Executing OpenSSL command.")
-                var revokecommand = util.format('openssl ca -config %sopenssl.cnf -revoke cert.pem -key "%s"', global.paths.pkipath, global.config.ca.passphrase);
+                var revokecommand = util.format('openssl ca -config %sintermediate/openssl.cnf -revoke cert.pem -key "%s"', global.paths.pkipath, global.config.ca.intermediate.passphrase);
 
                 exec(revokecommand, { cwd: tempdir }, function(error, stdout, stderr) {
                     if (error === null) {
