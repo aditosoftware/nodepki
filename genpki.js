@@ -104,6 +104,7 @@ var createFileStructure = function() {
         openssl_intermediate = openssl_intermediate.replace(/{organization}/g, global.config.ca.intermediate.organization);
         openssl_intermediate = openssl_intermediate.replace(/{commonname}/g, global.config.ca.intermediate.commonname);
         openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, 'http://' + global.config.ca.intermediate.ocsp.commonname);
+        openssl_intermediate = openssl_intermediate.replace(/{crlurl}/g, global.config.ca.intermediate.crl.url);
 
         fs.writeFileSync(pkidir + 'intermediate/openssl.cnf', openssl_intermediate);
 

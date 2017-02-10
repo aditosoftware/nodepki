@@ -3,7 +3,7 @@
 ###
 
 server:
-    ip: 192.168.42.53
+    ip: 0.0.0.0
     port: 8081
 
 
@@ -31,9 +31,9 @@ ca:
         ocsp:
             passphrase: yyyy
             country: DE
-            commonname: ocsp.adito.local
+            commonname: ocsp.adito.local:2560
         crl:
-            url: http://crl.adito.local/crl.pem
+            url: http://crl.adito.local:2561/crl.pem
 
 
 ###
@@ -44,7 +44,7 @@ ca:
 ###
 
 ocsp:
-    ip: 192.168.42.53
+    ip: 0.0.0.0
     port: 2560
 
 
@@ -54,5 +54,5 @@ ocsp:
 ###
 
 crl:
-    ip: 192.168.42.53
+    ip: 0.0.0.0
     port: 2561

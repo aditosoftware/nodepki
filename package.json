@@ -1,6 +1,6 @@
 {
   "name": "nodepki",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "NodeJS-based PKI server for x509 certificate management.",
   "author": "Thomas Leister <thomas.leister@mailbox.org>",
   "license": "MIT",
