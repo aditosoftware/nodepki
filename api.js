@@ -13,6 +13,8 @@ var certapi     = require('./api/certificate.js');
 var caapi        = require('./api/ca.js');
 
 
+var apipath = '/api/v1';
+
 /**
  * Initializes API paths.
  */
@@ -21,17 +23,29 @@ var initAPI = function(app) {
     app.use(bodyparser.json());
 
 
-    /*
-     * PUT requests
-     */
-
-    app.put('/certificates/request/', function(req, res) {
+    app.post(apipath + '/certificate/request/', function(req, res) {
         certapi.certificate.request(req, res);
     });
 
-    app.put('/certificates/revoke/', function(req, res) {
+    app.post(apipath + '/certificate/revoke/', function(req, res) {
         certapi.certificate.revoke(req, res);
     });
+
+    app.post(apipath + '/ca/cert/get/', function(req, res) {
+        caapi.cert.get(req, res);
+    });
+
+    app.post(apipath + '/certificates/list/', function(req, res) {
+        certapi.certificates.list(req, res);
+    });
+
+    app.post(apipath + '/certificate/get/', function(req, res) {
+        certapi.certificate.get(req, res);
+    });
+
+
+
+
 
 
     /*
@@ -47,9 +61,6 @@ var initAPI = function(app) {
         certapi.certificates.list(req, res);
     });
 
-    app.get('/ca/certs/:ca/:chain/', function(req, res) {
-        caapi.cert.get(req, res);
-    });
 
 };
 

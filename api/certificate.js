@@ -140,6 +140,21 @@ certificate.request = function(req, res){
 certificate.revoke = function(req, res){
     log.info("Revocation request for certificate");
 
+    // Validate user input
+    var schema = {
+        "properties": {
+            "cert": { "type": "string" }
+        },
+        "required": [ "cert" ]
+    }
+
+    var check = validator.checkAPI(schema, req.body);
+
+    if(check.success === false) {
+        wrongAPISchema(check.errors, res);
+        return;
+    }
+
     // Create temporary directory ...
     var tempdir = global.paths.tempdir + uuidV4() + "/";
     fs.mkdirSync(tempdir);
@@ -205,7 +220,7 @@ certificates.list = function(req, res){
         "required": [ "state" ]
     }
 
-    var check = validator.checkAPI(schema, req.params);
+    var check = validator.checkAPI(schema, req.body);
 
     if(check.success === false) {
         wrongAPISchema(check.errors, res);
@@ -213,11 +228,11 @@ certificates.list = function(req, res){
     }
 
 
-    log.info("Request: List all active certificates. Filter: " + req.params.state);
+    log.info("Request: List all active certificates. Filter: " + req.body.state);
 
     var filter = '';
 
-    switch(req.params.state) {
+    switch(req.body.state) {
         case 'all':
             filter = '';
             break;
@@ -261,12 +276,12 @@ certificate.get = function(req, res) {
     // Validate user input
     var schema = {
         "properties": {
-            "serial": { "type": "string" },
+            "serialnumber": { "type": "string" },
         },
-        "required": [ "serial" ]
+        "required": [ "serialnumber" ]
     }
 
-    var check = validator.checkAPI(schema, req.params);
+    var check = validator.checkAPI(schema, req.body);
 
     if(check.success === false) {
         wrongAPISchema(check.errors, res);
@@ -274,9 +289,9 @@ certificate.get = function(req, res) {
     }
 
 
-    log.info("Client is requesting certificate " + req.params.serial);
+    log.info("Client is requesting certificate " + req.body.serialnumber);
 
-    var certfile = global.paths.pkipath + "newcerts/" + req.params.serial + ".pem";
+    var certfile = global.paths.pkipath + "newcerts/" + req.body.serialnumber + ".pem";
 
     if(fs.existsSync(certfile)){
         fs.readFile(certfile, 'utf8', function(err, certdata){

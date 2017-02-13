@@ -1,3 +1,36 @@
+# New API
+
+## Certificates
+
+Request certificate
+
+    POST /api/v1/certificate/request/
+    Body: { csr:<csr>, applicant:<Applicant> }
+
+Revoke certificate
+
+    POST /api/v1/certificate/revoke/
+    Body: { cert:<cert> }
+
+Get certificate
+
+    POST /api/v1/certificate/get/
+    Body: { serialnumber:<serialnumber> }
+
+List certificates  
+
+    POST /api/v1/certificates/list/
+    Body: { state:<state> }
+
+
+## CAs
+
+Get CA certificate
+
+    POST /api/v1/ca/cert/get/
+    Body: { ca<ca> }
+
+
 # API
 
 ## Certificates
