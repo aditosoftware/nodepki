@@ -212,6 +212,22 @@ var createOCSPKeys = function() {
 };
 
 
+/*
+ * Sets correct file permissions for CA files
+ */
+var setFilePerms = function() {
+    return new Promise(function(resolve, reject) {
+        // Root CA
+        fs.chmodSync(pkidir + 'root/root.key.pem', 0400);
+        fs.chmodSync(pkidir + 'root/root.cert.pem', 0444);
+        fs.chmodSync(pkidir + 'root/openssl.cnf', 0400);
+
+        // Intermediate CA
+        fs.chmodSync(pkidir + 'intermediate/intermediate.key.pem', 0400);
+        fs.chmodSync(pkidir + 'intermediate/intermediate.cert.pem', 0444);
+        fs.chmodSync(pkidir + 'intermediate/openssl.cnf', 0400);
+    });
+};
 
 
 /**
@@ -224,10 +240,15 @@ if(PKIExists() === false) {
         createRootCA().then(function() {
             createIntermediateCA().then(function() {
                 createOCSPKeys().then(function() {
-                    log("### Finished!")
+                    setFilePerms().then(function() {
+                        log("### Finished!")
 
-                    // Tag mypki as ready.
-                    fs.writeFileSync(pkidir + 'created', '', 'utf8');
+                        // Tag mypki as ready.
+                        fs.writeFileSync(pkidir + 'created', '', 'utf8');
+                    })
+                    .catch(function() {
+                        log("Error: " + err)
+                    });
                 })
                 .catch(function(err) {
                     log("Error: " + err)
