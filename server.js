@@ -15,6 +15,7 @@ var yaml        = require('js-yaml');
 var log         = require('fancy-log');
 var express     = require('express');
 var figlet      = require('figlet');
+var commandExists = require('command-exists').sync;
 
 var api         = require('./api.js');
 var certdb      = require('./certdb.js');
@@ -52,6 +53,16 @@ if(fs.existsSync('config.yml')) {
 **********************************************************************");
 
     log("Server will quit now.");
+    process.exit();
+}
+
+
+/*
+ * Check if the openssl command is available
+ */
+
+if(commandExists('openssl') === false) {
+    log("openssl command is not available. Please install openssl.")
     process.exit();
 }
 

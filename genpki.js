@@ -226,6 +226,8 @@ var setFilePerms = function() {
         fs.chmodSync(pkidir + 'intermediate/intermediate.key.pem', 0400);
         fs.chmodSync(pkidir + 'intermediate/intermediate.cert.pem', 0444);
         fs.chmodSync(pkidir + 'intermediate/openssl.cnf', 0400);
+
+        resolve();
     });
 };
 
@@ -241,7 +243,7 @@ if(PKIExists() === false) {
             createIntermediateCA().then(function() {
                 createOCSPKeys().then(function() {
                     setFilePerms().then(function() {
-                        log("### Finished!")
+                        log("### Finished!");
 
                         // Tag mypki as ready.
                         fs.writeFileSync(pkidir + 'created', '', 'utf8');

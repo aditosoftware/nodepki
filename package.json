@@ -28,7 +28,8 @@
     "fancy-log": "1.x",
     "ajv": "4.x",
     "fs-extra": "2.0.x",
-    "figlet": "1.2.x"
+    "figlet": "1.2.x",
+    "command-exists": "1.2.x"
   },
   "homepage": "https://github.com/ThomasLeister/nodepki#readme",
   "devDependencies": {}
