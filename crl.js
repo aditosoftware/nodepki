@@ -51,7 +51,8 @@ var startHTTPServer = function() {
 
         log.info(">>>>>> CRL HTTP server is listening on " + host + ":" + port + " <<<<<<");
     });
-}
+};
+
 
 
 

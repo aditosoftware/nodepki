@@ -111,6 +111,13 @@ ocsp.startServer()
 crl.startHTTPServer();
 
 
+/*
+ * CRL renewal cronjob
+ */
+var crlrenewint = 1000 * 60 * 60 * 24; // 24h
+setInterval(crl.createCRL, crlrenewint);
+
+
 
 /*********************************
 * Server stop routine and events *
