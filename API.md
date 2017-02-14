@@ -2,87 +2,65 @@
 
 ## Certificates
 
-Request certificate
+### Request certificate
 
     POST /api/v1/certificate/request/
-    Body: { csr:<csr>, applicant:<Applicant> }
+    Request body: { csr:<csr>, applicant:<applicant> }
+    Response body: { success:<bool>, cert:<cert> }
 
-Revoke certificate
-
-    POST /api/v1/certificate/revoke/
-    Body: { cert:<cert> }
-
-Get certificate
-
-    POST /api/v1/certificate/get/
-    Body: { serialnumber:<serialnumber> }
-
-List certificates  
-
-    POST /api/v1/certificates/list/
-    Body: { state:<state> }
-
-
-## CAs
-
-Get CA certificate
-
-    POST /api/v1/ca/cert/get/
-    Body: { ca<ca> }
-
-
-# API
-
-## Certificates
-
-### Request new certificate via CSR
-
-    POST /certificates/
-
-    Request body: { csr: "<csr>", applicant: "<Username>" }
-
-    Response body: { success: <bool>, cert: "<cert>" }
-
-### Get list of issued certificates
-
-    GET /certificates/:state/
-
-    Response body: { success: <bool>, certificates: [<certificates>] }
-
-Valid :state values:
-
-* all
-* valid
-* expired
-* revoked
-
-### Get certificate by serial number
-
-    GET /certificates/:serial
-
-    Response body: { success: <bool>, cert: "<cert>" }
+    * applicant: <String> | Applicant, who requests certificate (for future usage)
+    * csr: <String> | CSR data in PEM format
 
 ### Revoke certificate
 
-    DELETE /certificates/
+    POST /api/v1/certificate/revoke/
+    Request body: { cert:<cert> }
+    Response body: { success:<bool> }
 
-    Request body: { cert: "<cert>" }
+    * cert: <String> | Certificate to revoke in PEM format
 
-    Response body: { success: <bool> }
+### Get certificate
 
+    POST /api/v1/certificate/get/
+    Request body: { serialnumber:<serialnumber> }
+    Response body: { success:<bool>, cert:<cert> }
 
-### Get CA certificates
+    * serialnumber: <String> | Serial number of the certificate
 
-    GET /ca/certs/root/
-    GET /ca/certs/intermediate/
-    GET /ca/certs/intermediate/chain/
+### List certificates  
 
-    Response body: { success: true, cert: <cert> }
+    POST /api/v1/certificates/list/
+    Request body: { state:<state> }
+
+    Response body:      {   
+                            success: <bool>,
+                            certs: [
+                                {
+                                    state: <state>,
+                                    expirationtime: <time>,
+                                    revocationtime: <time>,
+                                    serial: <serial>,
+                                    subject: <subject>
+                                 },
+                                ...
+                            ]
+                        }
+
+    * state: <Enum/String> | Can be 'valid', 'expired', 'revoked', 'all'
+
+## CAs
+
+## Get CA certificate
+
+    POST /api/v1/ca/cert/get/
+    Request body: { ca:<ca>, chain:'chain' }
+    Response body: { success:<bool>, cert:<cert> }
+
+    * ca: <Enum/String> | Can be 'root', 'intermediate'
+    * chain: (optional) | Whether to get full chain, for intermediate only
 
 
 ## Errors
-
-Error responses are send with HTTP error headers.
 
 Example error response:
 
@@ -96,7 +74,9 @@ Example error response:
     }
 
 
-### Error Codes
+### General error codes
 
 * 100: Invalid / insufficient API input (see errormessage)
 * 101: Internal server processing error.
+
+### Specific error codes
