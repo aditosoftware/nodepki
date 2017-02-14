@@ -16,13 +16,16 @@ var log         = require('fancy-log');
 var express     = require('express');
 var figlet      = require('figlet');
 var commandExists = require('command-exists').sync;
+var https       = require('https');
 
-var api         = require('./api.js');
+var api_http         = require('./api_http.js');
+var api_https         = require('./api_https.js');
 var certdb      = require('./certdb.js');
 var ocsp        = require('./ocsp-server.js');
 var crl         = require('./crl.js');
 
 var app         = express();
+var app_https   = express();
 
 
 /***************
@@ -92,9 +95,11 @@ global.paths = {
 
 // Re-index cert database
 certdb.reindex().then(function(){
-    // Start HTTP server
+    /*
+     * Start HTTP server for unencrypted API calls
+     */
     log.info("Starting HTTP server");
-    var server = app.listen(global.config.server.port, global.config.server.ip, function() {
+    var server = app.listen(global.config.server.port_http, global.config.server.ip, function() {
         var host = server.address().address;
         var port = server.address().port;
 
@@ -102,8 +107,22 @@ certdb.reindex().then(function(){
     });
 
     // Register API paths
-    log.info("Registering API endpoints");
-    api.initAPI(app);
+    log.info("Registering HTTP API endpoints");
+    api_http.initAPI(app);
+
+    /*
+     * Start HTTPS server for encrypted API calls
+     */
+
+    https.createServer({
+        key: fs.readFileSync(global.paths.pkipath + 'apicert/key.pem'),
+        cert: fs.readFileSync(global.paths.pkipath + 'apicert/cert.pem')
+    }, app_https).listen(global.config.server.port_https, global.config.server.ip, function() {
+        log(">>>>>> HTTPS API-Server is listening on " + global.config.server.ip + ":" + global.config.server.port_https + " <<<<<<")
+    });
+
+    log.info("Registering HTTPS API endpoints");
+    api_https.initAPI(app_https);
 }).catch(function(error){
     log.error("Could not initialize CertDB index: " + error);
 });
@@ -152,5 +171,6 @@ process.on('SIGQUIT', stopServer);
 
 // Export app variable
 module.exports = {
-    app: app
+    app: app,
+    app_https: app_https
 };

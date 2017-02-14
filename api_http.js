@@ -42,26 +42,6 @@ var initAPI = function(app) {
     app.post(apipath + '/certificate/get/', function(req, res) {
         certapi.certificate.get(req, res);
     });
-
-
-
-
-
-
-    /*
-     * GET requests
-     */
-
-    app.get('/certificates/:serial/', function(req, res) {
-        certapi.certificate.get(req, res);
-    });
-
-
-    app.get('/certificates/list/:state/', function(req, res) {
-        certapi.certificates.list(req, res);
-    });
-
-
 };
 
 

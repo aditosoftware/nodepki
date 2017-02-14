@@ -81,6 +81,16 @@ basicConstraints = critical, CA:true, pathlen:0
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 
 
+### For server certificates (API Cert)
+[ server_cert ]
+basicConstraints = CA:FALSE
+nsCertType = server
+nsComment = "OpenSSL Generated Server Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+
 
 ### For CRLs
 [ crl_ext ]

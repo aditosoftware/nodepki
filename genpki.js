@@ -106,7 +106,6 @@ var createFileStructure = function() {
         openssl_intermediate = openssl_intermediate.replace(/{commonname}/g, global.config.ca.intermediate.commonname);
         openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, 'http://' + global.config.ca.intermediate.ocsp.commonname);
         openssl_intermediate = openssl_intermediate.replace(/{crlurl}/g, global.config.ca.intermediate.crl.url);
-
         fs.writeFileSync(pkidir + 'intermediate/openssl.cnf', openssl_intermediate);
 
 
@@ -114,15 +113,26 @@ var createFileStructure = function() {
          * Prepare intermediate/ocsp dir
          */
         fs.ensureDirSync(pkidir + 'intermediate/ocsp');
-
         openssl_intermediate_ocsp = fs.readFileSync('pkitemplate/openssl_ocsp.cnf.tpl', 'utf8');
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{state}/g, global.config.ca.intermediate.state);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{country}/g, global.config.ca.intermediate.country);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{locality}/g, global.config.ca.intermediate.locality);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{organization}/g, global.config.ca.intermediate.organization);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{commonname}/g, global.config.ca.intermediate.ocsp.commonname);
-
         fs.writeFileSync(pkidir + 'intermediate/ocsp/openssl.cnf', openssl_intermediate_ocsp);
+
+
+        /*
+         * Prepare apicert configuration
+         */
+        fs.ensureDirSync(pkidir + 'apicert');
+        openssl_apicert = fs.readFileSync('pkitemplate/openssl_apicert.cnf.tpl', 'utf8');
+        openssl_apicert = openssl_apicert.replace(/{state}/g, global.config.ca.root.state);
+        openssl_apicert = openssl_apicert.replace(/{country}/g, global.config.ca.root.country);
+        openssl_apicert = openssl_apicert.replace(/{locality}/g, global.config.ca.root.locality);
+        openssl_apicert = openssl_apicert.replace(/{organization}/g, global.config.ca.root.organization);
+        openssl_apicert = openssl_apicert.replace(/{commonname}/g, global.config.server.domain);
+        fs.writeFileSync(pkidir + 'apicert/openssl.cnf', openssl_apicert);
 
         resolve();
     });
@@ -142,7 +152,6 @@ var createRootCA = function() {
             exec('openssl req -config openssl.cnf -key root.key.pem -new -x509 -days ' + global.config.ca.root.days + ' -sha256 -extensions v3_ca -out root.cert.pem -passin pass:' + global.config.ca.root.passphrase, {
                 cwd: pkidir + 'root'
             }, function() {
-                // cont
                 resolve();
             });
         });
@@ -177,7 +186,6 @@ var createIntermediateCA = function() {
                     root = fs.readFileSync(pkidir + 'root/root.cert.pem', 'utf8');
                     cachain = intermediate + '\n\n' + root;
                     fs.writeFileSync(pkidir + 'intermediate/ca-chain.cert.pem', cachain);
-
                     resolve();
                 });
             });
@@ -204,7 +212,6 @@ var createOCSPKeys = function() {
                     cwd: pkidir + 'intermediate/ocsp'
                 }, function() {
                     fs.removeSync(pkidir + 'intermediate/ocsp/ocsp.csr.pem');
-
                     resolve();
                 });
             });
@@ -213,10 +220,44 @@ var createOCSPKeys = function() {
 };
 
 
+
+
+/*
+ * Creates server certificate pair for HTTP API
+ * Directly form Root CA
+ */
+var createAPICert = function() {
+    log(">>> Creating HTTPS API certificates");
+
+    return new Promise(function(resolve, reject) {
+        // Create key
+        exec('openssl genrsa -out key.pem 4096', {
+            cwd: pkidir + 'apicert'
+        }, function() {
+            // Create request
+            exec('openssl req -config openssl.cnf -new -sha256 -key key.pem -out csr.pem', {
+                cwd: pkidir + 'apicert'
+            }, function() {
+                // Create certificate
+                exec('openssl ca -config ../root/openssl.cnf -extensions server_cert -days 3650 -notext -md sha256 -in csr.pem -out cert.pem -passin pass:' + global.config.ca.intermediate.passphrase + ' -batch', {
+                    cwd: pkidir + 'apicert'
+                }, function() {
+                    fs.removeSync(pkidir + 'apicert/csr.pem');
+                    resolve();
+                });
+            });
+        });
+    });
+};
+
+
+
 /*
  * Sets correct file permissions for CA files
  */
 var setFilePerms = function() {
+    log(">>> Setting file permissions")
+
     return new Promise(function(resolve, reject) {
         // Root CA
         fs.chmodSync(pkidir + 'root/root.key.pem', 0400);
@@ -233,6 +274,10 @@ var setFilePerms = function() {
 };
 
 
+
+
+
+
 /**
  * Start all the things!
  */
@@ -243,13 +288,18 @@ if(PKIExists() === false) {
         createRootCA().then(function() {
             createIntermediateCA().then(function() {
                 createOCSPKeys().then(function() {
-                    setFilePerms().then(function() {
-                        log("### Finished!");
+                    createAPICert().then(function() {
+                        setFilePerms().then(function() {
+                            log("### Finished!");
 
-                        // Tag mypki as ready.
-                        fs.writeFileSync(pkidir + 'created', '', 'utf8');
+                            // Tag mypki as ready.
+                            fs.writeFileSync(pkidir + 'created', '', 'utf8');
+                        })
+                        .catch(function(err) {
+                            log("Error: " + err)
+                        });
                     })
-                    .catch(function() {
+                    .catch(function(err) {
                         log("Error: " + err)
                     });
                 })

@@ -4,7 +4,9 @@
 
 server:
     ip: 0.0.0.0
-    port: 8081
+    port_http: 8080
+    port_https: 8081
+    domain: ca.adito.local
 
 
 ###
