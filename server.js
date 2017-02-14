@@ -44,7 +44,7 @@ if(fs.existsSync('config/config.yml')) {
 } else {
     // There is no config file yet. Create one from config.yml.default and quit server.
     log("No custom config file 'config/config.yml' found.");
-    fs.ensureDir('config');
+    fs.ensureDirSync('config');
     fs.copySync('config.default.yml', 'config/config.yml');
     log("Default config file was copied to config/config.yml.");
     console.log("\

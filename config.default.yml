@@ -56,3 +56,11 @@ ocsp:
 crl:
     ip: 0.0.0.0
     port: 2561
+
+
+###
+### Settings for end user certificates
+###
+cert:
+    lifetime_default: 1
+    lifetime_max: 365
