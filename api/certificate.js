@@ -291,7 +291,7 @@ certificate.get = function(req, res) {
 
     log.info("Client is requesting certificate " + req.body.serialnumber);
 
-    var certfile = global.paths.pkipath + "newcerts/" + req.body.serialnumber + ".pem";
+    var certfile = global.paths.pkipath + "intermediate/certs/" + req.body.serialnumber + ".pem";
 
     if(fs.existsSync(certfile)){
         fs.readFile(certfile, 'utf8', function(err, certdata){
