@@ -5,12 +5,13 @@
 ### Request certificate
 
     POST /api/v1/certificate/request/
-    Request body: { csr:<csr>, applicant:<applicant>, lifetime:<days> }
+    Request body: { csr:<csr>, applicant:<applicant>, lifetime:<days>, type:<type> }
     Response body: { success:<bool>, cert:<cert> }
 
     * applicant: <String> | Applicant, who requests certificate (for future usage)
     * csr: <String> | CSR data in PEM format
     * lifetime: <Int> (optional) | Lifetime of certificate in days
+    * type: <Enum/String> (optional) | Certificate type. Can be 'server', 'client'. Defaults to 'server'
 
 
 ### Revoke certificate

@@ -64,7 +64,8 @@ certificate.request = function(req, res){
         "properties": {
             "csr": { "type": "string" },
             "applicant": { "type": "string" },
-            "lifetime": { "type": "number" }
+            "lifetime": { "type": "number" },
+            "type": { "type": "string" }
         },
         "required": [ "csr", "applicant" ]
     }
@@ -83,6 +84,9 @@ certificate.request = function(req, res){
     var lifetime = req.body.lifetime ? req.body.lifetime : global.config.cert.lifetime_default;
     lifetime = global.config.cert.lifetime_max >= lifetime ? lifetime : global.config.cert.lifetime_max;
 
+    var type = (req.body.type && req.body.type === 'client') ? 'usr_cert' : 'server_cert';
+    log("Certificate type: " + type);
+
     // Create temporary directory ...
     var tempdir = global.paths.tempdir + uuidV4() + "/";
     fs.mkdirSync(tempdir);
@@ -92,7 +96,7 @@ certificate.request = function(req, res){
         fs.writeFile(tempdir + 'request.csr', csr, function(err) {
             if(err === null) {
                 // OpenSSL command template
-                var signcommand = util.format('openssl ca -batch -config %sintermediate/openssl.cnf -extensions server_cert -days ' + lifetime + ' -notext -md sha256 -in request.csr -key "%s" -out cert.pem', global.paths.pkipath, global.config.ca.intermediate.passphrase);
+                var signcommand = util.format('openssl ca -batch -config %sintermediate/openssl.cnf -extensions ' + type + ' -days ' + lifetime + ' -notext -md sha256 -in request.csr -key "%s" -out cert.pem', global.paths.pkipath, global.config.ca.intermediate.passphrase);
 
                 // Execute Linux Shell command
                 exec(signcommand, { cwd: tempdir }, function(error, stdout, stderr) {
