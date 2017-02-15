@@ -16,7 +16,7 @@ var startServer = function() {
 
         ocsp = spawn('openssl', [
             'ocsp',
-            '-port', global.config.ocsp.ip+':'+global.config.ocsp.port,
+            '-port', global.config.server.ip+':'+global.config.server.ocsp.port,
             '-text',
             '-sha256',
             '-index', 'index.txt',
@@ -32,7 +32,7 @@ var startServer = function() {
         // Enter ocsp private key password
         ocsp.stdin.write(global.config.ca.intermediate.ocsp.passphrase + '\n');
 
-        log(">>>>>> OCSP server is listening on " + global.config.ocsp.ip + ':' + global.config.ocsp.port + " <<<<<<");
+        log(">>>>>> OCSP server is listening on " + global.config.server.ip + ':' + global.config.server.ocsp.port + " <<<<<<");
 
         resolve();
 

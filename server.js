@@ -8,24 +8,23 @@
  * Loads config, prepares CertDB database, starts OCSP server, initializes and starts HTTP server and API.
  */
 
-var exec        = require('child_process').exec;
-var util        = require('util');
-var fs          = require('fs-extra');
-var yaml        = require('js-yaml');
-var log         = require('fancy-log');
-var express     = require('express');
-var figlet      = require('figlet');
-var commandExists = require('command-exists').sync;
-var https       = require('https');
+var exec            = require('child_process').exec;
+var util            = require('util');
+var fs              = require('fs-extra');
+var yaml            = require('js-yaml');
+var log             = require('fancy-log');
+var express         = require('express');
+var figlet          = require('figlet');
+var commandExists   = require('command-exists').sync;
+var https           = require('https');
 
-var api_http         = require('./api_http.js');
-var api_https         = require('./api_https.js');
-var certdb      = require('./certdb.js');
-var ocsp        = require('./ocsp-server.js');
-var crl         = require('./crl.js');
+var api             = require('./api.js');
+var certdb          = require('./certdb.js');
+var ocsp            = require('./ocsp-server.js');
+var publicsrv       = require('./publicsrv.js');
+var fingerprint     = require('./cert_fingerprint.js');
 
-var app         = express();
-var app_https   = express();
+var app             = express();
 
 
 /***************
@@ -96,33 +95,17 @@ global.paths = {
 // Re-index cert database
 certdb.reindex().then(function(){
     /*
-     * Start HTTP server for unencrypted API calls
-     */
-    log.info("Starting HTTP server");
-    var server = app.listen(global.config.server.port_http, global.config.server.ip, function() {
-        var host = server.address().address;
-        var port = server.address().port;
-
-        log.info(">>>>>> HTTP API-server is listening on " + host + ":" + port + " <<<<<<");
-    });
-
-    // Register API paths
-    log.info("Registering HTTP API endpoints");
-    api_http.initAPI(app);
-
-    /*
      * Start HTTPS server for encrypted API calls
      */
-
     https.createServer({
         key: fs.readFileSync(global.paths.pkipath + 'apicert/key.pem'),
         cert: fs.readFileSync(global.paths.pkipath + 'apicert/cert.pem')
-    }, app_https).listen(global.config.server.port_https, global.config.server.ip, function() {
-        log(">>>>>> HTTPS API-Server is listening on " + global.config.server.ip + ":" + global.config.server.port_https + " <<<<<<")
+    }, app).listen(global.config.server.api.port, global.config.server.ip, function() {
+        log(">>>>>> HTTPS API-Server is listening on " + global.config.server.ip + ":" + global.config.server.api.port + " <<<<<<")
     });
 
     log.info("Registering HTTPS API endpoints");
-    api_https.initAPI(app_https);
+    api.initAPI(app);
 }).catch(function(error){
     log.error("Could not initialize CertDB index: " + error);
 });
@@ -138,15 +121,25 @@ ocsp.startServer()
 });
 
 
-// Start CRL HTTP server. CRL was created before by CertDB re-indexing.
-crl.startHTTPServer();
+// Start Public HTTP server
+publicsrv.startHTTPServer();
+
+
+// Show Root Cert fingerprint
+fingerprint.getFingerprint(global.paths.pkipath + 'root/root.cert.pem').then(function(fingerprint_out) {
+    log(">>>>>> Root CA Fingerprint: " + fingerprint_out);
+})
+.catch(function(err) {
+    log.error("Could not get Root CA fingerprint!")
+});
+
 
 
 /*
  * CRL renewal cronjob
  */
 var crlrenewint = 1000 * 60 * 60 * 24; // 24h
-setInterval(crl.createCRL, crlrenewint);
+setInterval(publicsrv.createCRL, crlrenewint);
 
 
 
@@ -172,5 +165,4 @@ process.on('SIGQUIT', stopServer);
 // Export app variable
 module.exports = {
     app: app,
-    app_https: app_https
 };

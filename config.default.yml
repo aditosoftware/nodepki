@@ -4,9 +4,15 @@
 
 server:
     ip: 0.0.0.0
-    port_http: 8080
-    port_https: 8081
-    domain: ca.adito.local
+    api:
+        port: 8081
+        ext_url: ca.adito.local
+    public:
+        port: 8080
+        ext_url: ca.adito.local
+    ocsp:
+        port: 2560
+        ext_url: ca.adito.local
 
 
 ###
@@ -33,31 +39,6 @@ ca:
         ocsp:
             passphrase: yyyy
             country: DE
-            commonname: ocsp.adito.local:2560
-        crl:
-            url: http://crl.adito.local:2561/crl.pem
-
-
-###
-### OCSP server config:
-### IP-Address and port to listen to,
-### Passphrase used to encrypt the OCSP signing key.
-### Password and URL are used to generate PKI. If you want to change these settings, you have to re-create your pki!
-###
-
-ocsp:
-    ip: 0.0.0.0
-    port: 2560
-
-
-###
-### CRL HTTP server config
-### baseurl used to generate PKI. If you want to change these settings, you have to re-create your pki!
-###
-
-crl:
-    ip: 0.0.0.0
-    port: 2561
 
 
 ###

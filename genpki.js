@@ -104,8 +104,8 @@ var createFileStructure = function() {
         openssl_intermediate = openssl_intermediate.replace(/{locality}/g, global.config.ca.intermediate.locality);
         openssl_intermediate = openssl_intermediate.replace(/{organization}/g, global.config.ca.intermediate.organization);
         openssl_intermediate = openssl_intermediate.replace(/{commonname}/g, global.config.ca.intermediate.commonname);
-        openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, 'http://' + global.config.ca.intermediate.ocsp.commonname);
-        openssl_intermediate = openssl_intermediate.replace(/{crlurl}/g, global.config.ca.intermediate.crl.url);
+        openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, 'http://' + global.config.server.ocsp.ext_url);
+        openssl_intermediate = openssl_intermediate.replace(/{crlurl}/g, 'http://' + global.config.server.public.ext_url + '/intermediate.crl.pem');
         fs.writeFileSync(pkidir + 'intermediate/openssl.cnf', openssl_intermediate);
 
 
@@ -118,7 +118,7 @@ var createFileStructure = function() {
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{country}/g, global.config.ca.intermediate.country);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{locality}/g, global.config.ca.intermediate.locality);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{organization}/g, global.config.ca.intermediate.organization);
-        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{commonname}/g, global.config.ca.intermediate.ocsp.commonname);
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{commonname}/g, global.config.server.ocsp.ext_url);
         fs.writeFileSync(pkidir + 'intermediate/ocsp/openssl.cnf', openssl_intermediate_ocsp);
 
 
@@ -131,8 +131,15 @@ var createFileStructure = function() {
         openssl_apicert = openssl_apicert.replace(/{country}/g, global.config.ca.root.country);
         openssl_apicert = openssl_apicert.replace(/{locality}/g, global.config.ca.root.locality);
         openssl_apicert = openssl_apicert.replace(/{organization}/g, global.config.ca.root.organization);
-        openssl_apicert = openssl_apicert.replace(/{commonname}/g, global.config.server.domain);
+        openssl_apicert = openssl_apicert.replace(/{commonname}/g, global.config.server.api.ext_url);
         fs.writeFileSync(pkidir + 'apicert/openssl.cnf', openssl_apicert);
+
+
+        /*
+         * Creater public dir
+         */
+        fs.ensureDirSync(pkidir + 'public');
+
 
         resolve();
     });
@@ -152,6 +159,7 @@ var createRootCA = function() {
             exec('openssl req -config openssl.cnf -key root.key.pem -new -x509 -days ' + global.config.ca.root.days + ' -sha256 -extensions v3_ca -out root.cert.pem -passin pass:' + global.config.ca.root.passphrase, {
                 cwd: pkidir + 'root'
             }, function() {
+                fs.copySync(pkidir + 'root/root.cert.pem', pkidir + 'public/root.cert.pem');
                 resolve();
             });
         });
@@ -178,6 +186,9 @@ var createIntermediateCA = function() {
                 }, function() {
                     // Remove intermediate.csr.pem file
                     fs.removeSync(pkidir + 'intermediate/intermediate.csr.pem');
+
+                    // Make intermediate cert public
+                    fs.copySync(pkidir + 'intermediate/intermediate.cert.pem', pkidir + 'public/intermediate.cert.pem');
 
                     // Create CA chain file
                     // Read intermediate
