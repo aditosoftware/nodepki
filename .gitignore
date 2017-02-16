@@ -18,4 +18,3 @@ config.yml
 mypki/
 tmp/
 config/
-user.db
