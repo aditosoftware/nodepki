@@ -30,7 +30,7 @@
     "fs-extra": "2.0.x",
     "figlet": "1.2.x",
     "command-exists": "1.2.x",
-    "yargs": "6.6.x",
+    "yargs": "6.6.x"
   },
   "homepage": "https://github.com/ThomasLeister/nodepki#readme",
   "devDependencies": {}
