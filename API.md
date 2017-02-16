@@ -1,66 +1,101 @@
-# New API
+# API
+
+API Request bodies consist of a "data" object containing parameters for the requested operation and a "auth" object containing username and password of the user:
+
+    {
+        data: {
+            ... <request params>
+        },
+        auth: {
+            username: "thomas",
+            password: "thomaspass"
+        }
+    }
+
+For some API calls authentication is not required.
+
+API response bodies:
+
+    {
+        success: <bool>,
+        <more attributes>
+    }
 
 ## Certificates
 
 ### Request certificate
 
     POST /api/v1/certificate/request/
-    Request body: { csr:<csr>, applicant:<applicant>, lifetime:<days>, type:<type> }
-    Response body: { success:<bool>, cert:<cert> }
 
+    Request params:
     * applicant: <String> | Applicant, who requests certificate (for future usage)
     * csr: <String> | CSR data in PEM format
     * lifetime: <Int> (optional) | Lifetime of certificate in days
     * type: <Enum/String> (optional) | Certificate type. Can be 'server', 'client'. Defaults to 'server'
 
+    Response attributes:
+    * cert: <String> | certificate
+
 
 ### Revoke certificate
 
     POST /api/v1/certificate/revoke/
-    Request body: { cert:<cert> }
-    Response body: { success:<bool> }
 
+    Request params:
     * cert: <String> | Certificate to revoke in PEM format
+
+    Response attributes: success
+
 
 ### Get certificate
 
     POST /api/v1/certificate/get/
-    Request body: { serialnumber:<serialnumber> }
-    Response body: { success:<bool>, cert:<cert> }
 
+    Request params:
     * serialnumber: <String> | Serial number of the certificate
+
+    Response attributes:
+    * cert: <String> | Certificate
+
+
 
 ### List certificates  
 
     POST /api/v1/certificates/list/
-    Request body: { state:<state> }
 
-    Response body:      {   
-                            success: <bool>,
-                            certs: [
-                                {
-                                    state: <state>,
-                                    expirationtime: <time>,
-                                    revocationtime: <time>,
-                                    serial: <serial>,
-                                    subject: <subject>
-                                 },
-                                ...
-                            ]
-                        }
+    Request params:
+    * state: <Enum/String> | 'valid', 'expired', 'revoked', 'all'
 
-    * state: <Enum/String> | Can be 'valid', 'expired', 'revoked', 'all'
+    Response body:     
+     {   
+        success: <bool>,
+        certs: [
+            {
+                state: <state>,
+                expirationtime: <time>,
+                revocationtime: <time>,
+                serial: <serial>,
+                subject: <subject>
+             },
+            ...
+        ]
+    }
+
 
 ## CAs
 
 ## Get CA certificate
 
-    POST /api/v1/ca/cert/get/
-    Request body: { ca:<ca>, chain:'chain' }
-    Response body: { success:<bool>, cert:<cert> }
+(No auth required)
 
+    POST /api/v1/ca/cert/get/
+
+    Request params:
     * ca: <Enum/String> | Can be 'root', 'intermediate'
     * chain: (optional) | Whether to get full chain, for intermediate only
+
+    Response body:
+    * cert: <String> | CA certificate
 
 
 ## Errors
@@ -81,5 +116,6 @@ Example error response:
 
 * 100: Invalid / insufficient API input (see errormessage)
 * 101: Internal server processing error.
+* 200: Invalid authentication credentials
 
 ### Specific error codes
