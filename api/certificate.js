@@ -14,6 +14,7 @@ var log = require('fancy-log');
 
 var certdb = require('../certdb.js');
 var validator = require('../validator.js');
+var authMod = require('../auth.js');
 
 var certificate = {};
 var certificates = {};
@@ -52,7 +53,21 @@ function wrongAPISchema(apierrors, res) {
     }
 
     res.end(JSON.stringify(resobj))
-}
+};
+
+
+function wrongLoginCredentials(res) {
+    errors = [
+        { code: 200, message: 'Invalid login credentials.' }
+    ];
+
+    var resobj = {
+        success: false,
+        errors: errors
+    }
+
+    res.end(JSON.stringify(resobj))
+};
 
 
 /**
@@ -62,29 +77,52 @@ certificate.request = function(req, res){
     // Validate user input
     var schema = {
         "properties": {
-            "csr": { "type": "string" },
-            "applicant": { "type": "string" },
-            "lifetime": { "type": "number" },
-            "type": { "type": "string" }
+            "data": {
+                "type": "object",
+                "properties": {
+                    "csr": { "type": "string" },
+                    "lifetime": { "type": "number" },
+                    "type": { "type": "string" },
+                },
+                "required": [ "csr" ]
+            },
+
+            "auth": {
+                "type": "object",
+                "properties": {
+                    "username": { "type": "string"},
+                    "password": { "type": "string"}
+                },
+                "required": [ "username", "password" ]
+            }
         },
-        "required": [ "csr", "applicant" ]
+        "required": [ "data", "auth" ]
     }
 
-    var check = validator.checkAPI(schema, req.body);
-
-    if(check.success === false) {
+    // Check API conformity
+    if(validator.checkAPI(schema, req.body).success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
 
+    var data = req.body.data;
+    var auth = req.body.auth;
 
-    log.info("Certificate request by %s ...", req.body.applicant);
-    var csr = req.body.csr;
+    // Check access
+    if (authMod.checkUser(auth.username, auth.password) === false) {
+        wrongLoginCredentials(res);
+        return;
+    }
 
-    var lifetime = req.body.lifetime ? req.body.lifetime : global.config.cert.lifetime_default;
+
+    log.info("Certificate request by %s ...", auth.username);
+
+    var csr = data.csr;
+
+    var lifetime = data.lifetime ? data.lifetime : global.config.cert.lifetime_default;
     lifetime = global.config.cert.lifetime_max >= lifetime ? lifetime : global.config.cert.lifetime_max;
 
-    var type = (req.body.type && req.body.type === 'client') ? 'usr_cert' : 'server_cert';
+    var type = (data.type && data.type === 'client') ? 'usr_cert' : 'server_cert';
     log("Certificate type: " + type);
 
     // Create temporary directory ...
@@ -146,22 +184,47 @@ certificate.request = function(req, res){
 
 
 certificate.revoke = function(req, res){
-    log.info("Revocation request for certificate");
-
     // Validate user input
     var schema = {
         "properties": {
-            "cert": { "type": "string" }
+            "data": {
+                "type": "object",
+                "properties": {
+                    "cert": { "type": "string" }
+                },
+                "required": [ "cert" ]
+            },
+
+            "auth": {
+                "type": "object",
+                "properties": {
+                    "username": { "type": "string"},
+                    "password": { "type": "string"}
+                },
+                "required": [ "username", "password" ]
+            }
         },
-        "required": [ "cert" ]
+        "required": [ "data", "auth" ]
     }
 
-    var check = validator.checkAPI(schema, req.body);
-
-    if(check.success === false) {
+    // Check API conformity
+    if(validator.checkAPI(schema, req.body).success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
+
+    var data = req.body.data;
+    var auth = req.body.auth;
+
+    // Check access
+    if (authMod.checkUser(auth.username, auth.password) === false) {
+        wrongLoginCredentials(res);
+        return;
+    }
+
+
+    log.info("Request: Revocation request for certificate. By: " + auth.username);
+
 
     // Create temporary directory ...
     var tempdir = global.paths.tempdir + uuidV4() + "/";
@@ -170,7 +233,7 @@ certificate.revoke = function(req, res){
     new Promise(function(resolve, reject){
         // Write certificate to temporary file
 
-        fs.writeFile(tempdir + 'cert.pem', req.body.cert, function(err) {
+        fs.writeFile(tempdir + 'cert.pem', data.cert, function(err) {
             if(err === null) {
                 // Execute OpenSSL command
                 log.info("Executing OpenSSL command.")
@@ -223,24 +286,47 @@ certificates.list = function(req, res){
     // Validate user input
     var schema = {
         "properties": {
-            "state": { "type": "string" },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "state": { "type": "string" },
+                },
+                "required": [ "state" ]
+            },
+
+            "auth": {
+                "type": "object",
+                "properties": {
+                    "username": { "type": "string"},
+                    "password": { "type": "string"}
+                },
+                "required": [ "username", "password" ]
+            }
         },
-        "required": [ "state" ]
+        "required": [ "data", "auth" ]
     }
 
-    var check = validator.checkAPI(schema, req.body);
-
-    if(check.success === false) {
+    // Check API conformity
+    if(validator.checkAPI(schema, req.body).success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
 
+    var data = req.body.data;
+    var auth = req.body.auth;
 
-    log.info("Request: List all active certificates. Filter: " + req.body.state);
+    // Check access
+    if (authMod.checkUser(auth.username, auth.password) === false) {
+        wrongLoginCredentials(res);
+        return;
+    }
+
+
+    log.info("Request: List all active certificates. Filter: " + data.state + ". By: " + auth.username);
 
     var filter = '';
 
-    switch(req.body.state) {
+    switch(data.state) {
         case 'all':
             filter = '';
             break;
@@ -284,22 +370,45 @@ certificate.get = function(req, res) {
     // Validate user input
     var schema = {
         "properties": {
-            "serialnumber": { "type": "string" },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "serialnumber": { "type": "string" },
+                },
+                "required": [ "serialnumber" ]
+            },
+
+            "auth": {
+                "type": "object",
+                "properties": {
+                    "username": { "type": "string"},
+                    "password": { "type": "string"}
+                },
+                "required": [ "username", "password" ]
+            }
         },
-        "required": [ "serialnumber" ]
+        "required": [ "data", "auth" ]
     }
 
-    var check = validator.checkAPI(schema, req.body);
-
-    if(check.success === false) {
+    // Check API conformity
+    if(validator.checkAPI(schema, req.body).success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
 
+    var data = req.body.data;
+    var auth = req.body.auth;
 
-    log.info("Client is requesting certificate " + req.body.serialnumber);
+    // Check access
+    if (authMod.checkUser(auth.username, auth.password) === false) {
+        wrongLoginCredentials(res);
+        return;
+    }
 
-    var certfile = global.paths.pkipath + "intermediate/certs/" + req.body.serialnumber + ".pem";
+
+    log.info("Request: Get certificate. By: " + auth.username);
+
+    var certfile = global.paths.pkipath + "intermediate/certs/" + data.serialnumber + ".pem";
 
     if(fs.existsSync(certfile)){
         fs.readFile(certfile, 'utf8', function(err, certdata){

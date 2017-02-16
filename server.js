@@ -84,6 +84,10 @@ if(fs.existsSync('mypki/created') === false) {
 // Ensure tmp dir
 fs.ensureDir('tmp');
 
+// Make sure DB file exists ...
+fs.ensureFileSync('user.db');
+
+
 // Base Base path of the application
 global.paths = {
     basepath: __dirname + "/",
