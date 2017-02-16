@@ -35,6 +35,7 @@ policy            = policy_strict
 [ policy_strict ]
 countryName             = match
 stateOrProvinceName     = match
+localityName            = optional
 organizationName        = match
 organizationalUnitName  = optional
 commonName              = supplied
