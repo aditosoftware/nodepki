@@ -24,7 +24,7 @@ var startServer = function() {
             '-rkey', 'ocsp/ocsp.key.pem',
             '-rsigner', 'ocsp/ocsp.cert.pem'
          ], {
-            cwd: "mypki/intermediate",
+            cwd: global.paths.pkipath + 'intermediate',
             detached: true,
             shell: true
         });

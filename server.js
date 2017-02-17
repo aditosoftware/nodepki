@@ -37,21 +37,30 @@ console.log(figlet.textSync('NodePKI', {}));
 console.log("  By ADITO Software GmbH\n\n");
 
 
+// Base Base path of the application
+global.paths = {
+    basepath: __dirname + "/",
+    datapath: __dirname + '/data/',
+    pkipath: __dirname + "/data/mypki/",
+    tempdir: __dirname + "/tmp/"
+};
+
+
 /*
  * Make sure there is a config file config.yml
  */
-if(fs.existsSync('config/config.yml')) {
-    log.info("Reading config file config/config.yml ...");
-    global.config = yaml.safeLoad(fs.readFileSync('config/config.yml', 'utf8'));
+if(fs.existsSync('data/config/config.yml')) {
+    log.info("Reading config file data/config/config.yml ...");
+    global.config = yaml.safeLoad(fs.readFileSync('data/config/config.yml', 'utf8'));
 } else {
     // There is no config file yet. Create one from config.yml.default and quit server.
-    log("No custom config file 'config/config.yml' found.");
-    fs.ensureDirSync('config');
-    fs.copySync('config.default.yml', 'config/config.yml');
-    log("Default config file was copied to config/config.yml.");
+    log("No custom config file 'data/config/config.yml' found.");
+    fs.ensureDirSync('data/config');
+    fs.copySync('config.default.yml', 'data/config/config.yml');
+    log("Default config file was copied to data/config/config.yml.");
     console.log("\
 **********************************************************************\n\
-***     Please customize config/config.yml according to your       ***\n\
+***   Please customize data/config/config.yml according to your    ***\n\
 ***                 environment and restart script.                ***\n\
 **********************************************************************");
 
@@ -74,8 +83,8 @@ if(commandExists('openssl') === false) {
  * Check if there is a PKI directory with all the OpenSSL contents.
  */
 
-fs.ensureDir('mypki');
-if(fs.existsSync('mypki/created') === false) {
+fs.ensureDir(global.paths.pkipath);
+if(fs.existsSync(global.paths.pkipath + 'created') === false) {
     log("There is no PKI available. Please generate the content of mypki by executing 'nodejs genpki.js'.");
     process.exit();
 }
@@ -85,15 +94,7 @@ if(fs.existsSync('mypki/created') === false) {
 fs.ensureDir('tmp');
 
 // Make sure DB file exists ...
-fs.ensureFileSync('user.db');
-
-
-// Base Base path of the application
-global.paths = {
-    basepath: __dirname + "/",
-    pkipath: __dirname + "/mypki/",
-    tempdir: __dirname + "/tmp/"
-};
+fs.ensureFileSync('data/user.db');
 
 
 // Re-index cert database

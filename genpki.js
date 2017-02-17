@@ -8,25 +8,25 @@ var yaml        = require('js-yaml');
 var exec        = require('child_process').exec;
 
 // Absolute pki base dir
-const pkidir = __dirname + '/' + 'mypki/';
+const pkidir = __dirname + '/data/' + 'mypki/';
 
 
 
 /*
  * Make sure there is a config file config.yml
  */
-if(fs.existsSync('config/config.yml')) {
-    log.info("Reading config file config/config.yml ...");
-    global.config = yaml.safeLoad(fs.readFileSync('config/config.yml', 'utf8'));
+if(fs.existsSync('data/config/config.yml')) {
+    log.info("Reading config file data/config/config.yml ...");
+    global.config = yaml.safeLoad(fs.readFileSync('data/config/config.yml', 'utf8'));
 } else {
     // There is no config file yet. Create one from config.yml.default and quit server.
-    log("No custom config file 'config/config.yml' found.");
-    fs.ensureDirSync('config');
-    fs.copySync('config.default.yml', 'config/config.yml');
-    log("Default config file was copied to config/config.yml.");
+    log("No custom config file 'data/config/config.yml' found.");
+    fs.ensureDirSync('data/config');
+    fs.copySync('config.default.yml', 'data/config/config.yml');
+    log("Default config file was copied to data/config/config.yml.");
     console.log("\
 **********************************************************************\n\
-***     Please customize config/config.yml according to your       ***\n\
+***   Please customize data/config/config.yml according to your    ***\n\
 ***                 environment and restart script.                ***\n\
 **********************************************************************");
 
@@ -35,11 +35,10 @@ if(fs.existsSync('config/config.yml')) {
 }
 
 
-
 var PKIExists = function() {
-        fs.ensureDir('mypki');
+        fs.ensureDir(pkidir);
 
-        if(fs.existsSync('mypki/created')) {
+        if(fs.existsSync(pkidir + 'created')) {
             return true;
         } else {
             return false;
@@ -47,12 +46,11 @@ var PKIExists = function() {
 };
 
 
-
 var createFileStructure = function() {
     log(">>> Creating CA file structure")
 
     return new Promise(function(resolve, reject) {
-        fs.ensureDirSync('mypki');
+        fs.ensureDirSync(pkidir);
 
         /*
          * Prepare root/ dir
@@ -283,7 +281,6 @@ var setFilePerms = function() {
         resolve();
     });
 };
-
 
 
 

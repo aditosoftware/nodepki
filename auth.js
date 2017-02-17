@@ -2,8 +2,8 @@
  * Auth module
  */
 
-var crypto = require('crypto');
-var fs = require('fs-extra');
+var crypto  = require('crypto');
+var fs      = require('fs-extra');
 
 
 /*
@@ -18,7 +18,7 @@ var checkUser = function(username, password) {
     var expected = username + ':' + hash;
 
     // Read password file
-    var passfile = fs.readFileSync('config/user.db', 'utf8');
+    var passfile = fs.readFileSync('data/user.db', 'utf8');
     var lines = passfile.split('\n');
 
     var found = false;
@@ -36,13 +36,13 @@ var checkUser = function(username, password) {
  */
 var addUser = function(username, password) {
     // Make sure DB file exists ...
-    fs.ensureFileSync('config/user.db');
+    fs.ensureFileSync('data/user.db');
 
     // Calc passhash
     var passhash = crypto.createHash('sha256').update(password).digest('base64');
 
     // Read existing file
-    var passfile = fs.readFileSync('config/user.db', 'utf8');
+    var passfile = fs.readFileSync('data/user.db', 'utf8');
 
     // Check if user alreadys exists
     var lines = passfile.split('\n');
@@ -55,7 +55,7 @@ var addUser = function(username, password) {
     if(found === false) {
         // Update file
         passfile = passfile + username + ':' + passhash + '\n';
-        fs.writeFileSync('config/user.db', passfile, 'utf8');
+        fs.writeFileSync('data/user.db', passfile, 'utf8');
 
         return true;
     } else {
@@ -69,9 +69,9 @@ var addUser = function(username, password) {
  * Delete user from DB
  */
 var delUser = function(username) {
-    fs.ensureFileSync('config/user.db');
+    fs.ensureFileSync('data/user.db');
 
-    var passfile = fs.readFileSync('config/user.db', 'utf8');
+    var passfile = fs.readFileSync('data/user.db', 'utf8');
     var lines = passfile.split('\n');
     var changed = false;
 
@@ -91,8 +91,7 @@ var delUser = function(username) {
         }
     });
 
-    fs.writeFileSync('config/user.db', passfile_out);
-
+    fs.writeFileSync('data/user.db', passfile_out);
 
     return changed;
 };

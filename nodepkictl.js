@@ -2,10 +2,10 @@
  * NodePKI management tool
  */
 
-var log = require('fancy-log');
-var yargs = require('yargs');
+var log     = require('fancy-log');
+var yargs   = require('yargs');
 
-var auth = require('./auth.js');
+var auth    = require('./auth.js');
 
 
 /**

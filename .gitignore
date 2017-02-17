@@ -6,15 +6,8 @@ node_modules/
 
 
 ##
-## Ignore custom config
+## Ignore dynamic directories
 ##
 
-config.yml
-
-##
-## Ignore directories to be generated dynamically.
-##
-
-mypki/
+data/
 tmp/
-config/

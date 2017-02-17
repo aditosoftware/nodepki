@@ -21,7 +21,7 @@ var reindex = function() {
 
         // Index-Datei öffnen
         var lineReader = require('readline').createInterface({
-            input: require('fs').createReadStream('./mypki/intermediate/index.txt')
+            input: require('fs').createReadStream(global.paths.pkipath + 'intermediate/index.txt')
         });
 
         certificates = [];

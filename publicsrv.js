@@ -22,7 +22,7 @@ var createCRL = function() {
       '-gencrl',
       '-out', 'crl/crl.pem'
     ], {
-      cwd: "mypki/intermediate",
+      cwd: global.paths.pkipath + 'intermediate',
       shell: true,
       detached: true
     });
@@ -39,7 +39,7 @@ var createCRL = function() {
             log("CRL successfully created");
 
             // Copy CRL to public directory
-            fs.copySync('mypki/intermediate/crl/crl.pem', 'mypki/public/intermediate.crl.pem');
+            fs.copySync(global.paths.pkipath + 'intermediate/crl/crl.pem', global.paths.pkipath + 'public/intermediate.crl.pem');
         } else {
             log.error("Error during CRL creation")
         }

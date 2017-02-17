@@ -19,9 +19,6 @@ function respond(res, resobj) {
 
 
 
-
-var pkidir = 'mypki/';
-
 /**
  * Get CA Cert
  */
@@ -38,13 +35,13 @@ ca.cert.get = function(req, res) {
 
     switch(data.ca) {
         case 'root':
-            cert = fs.readFileSync(pkidir + 'root/root.cert.pem', 'utf8');
+            cert = fs.readFileSync(global.paths.pkipath + 'root/root.cert.pem', 'utf8');
             break;
         case 'intermediate':
             if(data.chain === 'chain') {
-                cert = fs.readFileSync(pkidir + 'intermediate/ca-chain.cert.pem', 'utf8');
+                cert = fs.readFileSync(global.paths.pkipath + 'intermediate/ca-chain.cert.pem', 'utf8');
             } else {
-                cert = fs.readFileSync(pkidir + 'intermediate/intermediate.cert.pem', 'utf8');
+                cert = fs.readFileSync(global.paths.pkipath + 'intermediate/intermediate.cert.pem', 'utf8');
             }
             break;
         default:
