@@ -161,7 +161,7 @@ certificate.request = function(req, res){
                         });
                     } else {
                         log.error("OpenSSL Error:\r\n", error);
-                        log.error("Could not issue certificate. Maybe there was already a certificate created from the submitted .CSR?");
+                        log.error("Could not issue certificate.");
 
                         errorresponse({ code:101, message:"Internal server error."}, res);
                         resolve();

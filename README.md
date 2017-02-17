@@ -41,6 +41,16 @@ There is an example config file "config.yml.default" which can be copied to "con
     nodejs genpki.js
 
 
+## API user login
+
+### Add new user
+
+    nodejs nodepkictl useradd --username user1 --password user1password
+
+### Remove user
+
+    nodejs nodepkictl userdel --username user1
+
 ## Start all the things!
 
 Start your API server:
