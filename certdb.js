@@ -4,7 +4,7 @@
 
 
 var log     = require('fancy-log');
-var publicsrv     = require('./publicsrv.js');
+var crl     = require('./crl.js');
 
 certificates = new Array();
 
@@ -49,7 +49,7 @@ var reindex = function() {
             log.info("Reindexing finished");
 
             // Re-Create CRL
-            publicsrv.createCRL();
+            crl.createCRL();
 
             resolve();
         });

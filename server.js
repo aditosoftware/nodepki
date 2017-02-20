@@ -16,12 +16,13 @@ var log             = require('fancy-log');
 var express         = require('express');
 var figlet          = require('figlet');
 var commandExists   = require('command-exists').sync;
-var https           = require('https');
+var http            = require('http');
+var bodyparser      = require('body-parser');
 
 var api             = require('./api.js');
 var certdb          = require('./certdb.js');
 var ocsp            = require('./ocsp-server.js');
-var publicsrv       = require('./publicsrv.js');
+var crl             = require('./crl.js');
 var fingerprint     = require('./cert_fingerprint.js');
 
 var app             = express();
@@ -100,16 +101,19 @@ fs.ensureFileSync('data/user.db');
 // Re-index cert database
 certdb.reindex().then(function(){
     /*
-     * Start HTTPS server for encrypted API calls
+     * Start HTTP server
      */
-    https.createServer({
-        key: fs.readFileSync(global.paths.pkipath + 'apicert/key.pem'),
-        cert: fs.readFileSync(global.paths.pkipath + 'apicert/cert.pem')
-    }, app).listen(global.config.server.api.port, global.config.server.ip, function() {
-        log(">>>>>> HTTPS API-Server is listening on " + global.config.server.ip + ":" + global.config.server.api.port + " <<<<<<")
+    app.use('/public', express.static(global.paths.pkipath + 'public'));    // Static dir.
+    app.use('/api', bodyparser.json());     // JSON body parser for /api/ paths
+
+    var server = app.listen(global.config.server.http.port, global.config.server.ip, function() {
+        var host = server.address().address;
+        var port = server.address().port;
+
+        log.info(">>>>>> HTTP server is listening on " + host + ":" + port + " <<<<<<");
     });
 
-    log.info("Registering HTTPS API endpoints");
+    log.info("Registering API endpoints");
     api.initAPI(app);
 }).catch(function(error){
     log.error("Could not initialize CertDB index: " + error);
@@ -126,9 +130,6 @@ ocsp.startServer()
 });
 
 
-// Start Public HTTP server
-publicsrv.startHTTPServer();
-
 
 // Show Root Cert fingerprint
 fingerprint.getFingerprint(global.paths.pkipath + 'root/root.cert.pem').then(function(fingerprint_out) {
@@ -144,7 +145,7 @@ fingerprint.getFingerprint(global.paths.pkipath + 'root/root.cert.pem').then(fun
  * CRL renewal cronjob
  */
 var crlrenewint = 1000 * 60 * 60 * 24; // 24h
-setInterval(publicsrv.createCRL, crlrenewint);
+setInterval(crl.createCRL, crlrenewint);
 
 
 

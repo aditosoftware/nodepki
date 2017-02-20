@@ -4,10 +4,7 @@
 
 server:
     ip: 0.0.0.0
-    api:
-        port: 8081
-        ext_url: ca.adito.local
-    public:
+    http:
         port: 8080
         ext_url: ca.adito.local
     ocsp:

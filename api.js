@@ -19,9 +19,6 @@ var apipath = '/api/v1';
  * Initializes API paths.
  */
 var initAPI = function(app) {
-    // Always use JSON Body parsing for API endpoints.
-    app.use(bodyparser.json());
-
     app.post(apipath + '/certificate/request/', function(req, res) {
         certapi.certificate.request(req, res);
     });

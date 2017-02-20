@@ -1,16 +1,11 @@
 /*
- * Serve public files like CRL, Root Cert and Intermediate Cert.
+ * Creates CRL
  */
 
 
 var spawn   = require('child_process').spawn;
 var log     = require('fancy-log');
-var express = require('express');
-var fs = require('fs-extra');
-
-var app = express();
-
-
+var fs      = require('fs-extra');
 
 /*
  * Creates / updates CRL and overwrites old version.
@@ -47,24 +42,6 @@ var createCRL = function() {
 };
 
 
-
-
-
-var startHTTPServer = function() {
-    app.use(express.static(global.paths.pkipath + 'public'));
-
-    var server = app.listen(global.config.server.public.port, global.config.server.ip, function() {
-        var host = server.address().address;
-        var port = server.address().port;
-
-        log.info(">>>>>> Public HTTP server is listening on " + host + ":" + port + " <<<<<<");
-    });
-};
-
-
-
-
 module.exports = {
-    createCRL: createCRL,
-    startHTTPServer: startHTTPServer
+    createCRL: createCRL
 }
