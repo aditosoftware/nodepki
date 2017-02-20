@@ -5,11 +5,12 @@
 server:
     ip: 0.0.0.0
     http:
+        domain: ca.adito.local
         port: 8080
-        ext_url: ca.adito.local
     ocsp:
+        domain: ca.adito.local
         port: 2560
-        ext_url: ca.adito.local
+
 
 
 ###
@@ -36,6 +37,9 @@ ca:
         ocsp:
             passphrase: yyyy
             country: DE
+            url: "http://ca.adito.local:2560"
+        crl:
+            url: "http://ca.adito.local:8080/public/intermediate.crl.pem"
 
 
 ###

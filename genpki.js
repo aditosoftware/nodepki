@@ -102,8 +102,8 @@ var createFileStructure = function() {
         openssl_intermediate = openssl_intermediate.replace(/{locality}/g, global.config.ca.intermediate.locality);
         openssl_intermediate = openssl_intermediate.replace(/{organization}/g, global.config.ca.intermediate.organization);
         openssl_intermediate = openssl_intermediate.replace(/{commonname}/g, global.config.ca.intermediate.commonname);
-        openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, 'http://' + global.config.server.ocsp.ext_url);
-        openssl_intermediate = openssl_intermediate.replace(/{crlurl}/g, 'http://' + global.config.server.public.ext_url + '/intermediate.crl.pem');
+        openssl_intermediate = openssl_intermediate.replace(/{ocspurl}/g, global.config.ca.intermediate.ocsp.url);
+        openssl_intermediate = openssl_intermediate.replace(/{crlurl}/g, global.config.ca.intermediate.crl.url);
         fs.writeFileSync(pkidir + 'intermediate/openssl.cnf', openssl_intermediate);
 
 
@@ -116,7 +116,7 @@ var createFileStructure = function() {
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{country}/g, global.config.ca.intermediate.country);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{locality}/g, global.config.ca.intermediate.locality);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{organization}/g, global.config.ca.intermediate.organization);
-        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{commonname}/g, global.config.server.ocsp.ext_url);
+        openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{commonname}/g, global.config.server.ocsp.domain);
         fs.writeFileSync(pkidir + 'intermediate/ocsp/openssl.cnf', openssl_intermediate_ocsp);
 
 
@@ -129,7 +129,7 @@ var createFileStructure = function() {
         openssl_apicert = openssl_apicert.replace(/{country}/g, global.config.ca.root.country);
         openssl_apicert = openssl_apicert.replace(/{locality}/g, global.config.ca.root.locality);
         openssl_apicert = openssl_apicert.replace(/{organization}/g, global.config.ca.root.organization);
-        openssl_apicert = openssl_apicert.replace(/{commonname}/g, global.config.server.api.ext_url);
+        openssl_apicert = openssl_apicert.replace(/{commonname}/g, global.config.server.http.domain);
         fs.writeFileSync(pkidir + 'apicert/openssl.cnf', openssl_apicert);
 
 
