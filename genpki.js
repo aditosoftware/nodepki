@@ -248,7 +248,7 @@ var createAPICert = function() {
                 cwd: pkidir + 'apicert'
             }, function() {
                 // Create certificate
-                exec('openssl ca -config ../root/openssl.cnf -extensions server_cert -days 3650 -notext -md sha256 -in csr.pem -out cert.pem -passin pass:' + global.config.ca.intermediate.passphrase + ' -batch', {
+                exec('openssl ca -config ../root/openssl.cnf -extensions server_cert -days 3650 -notext -md sha256 -in csr.pem -out cert.pem -passin pass:' + global.config.ca.root.passphrase + ' -batch', {
                     cwd: pkidir + 'apicert'
                 }, function() {
                     fs.removeSync(pkidir + 'apicert/csr.pem');
