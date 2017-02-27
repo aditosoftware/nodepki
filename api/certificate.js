@@ -100,7 +100,8 @@ certificate.request = function(req, res){
     }
 
     // Check API conformity
-    if(validator.checkAPI(schema, req.body).success === false) {
+    var check = validator.checkAPI(schema, req.body)
+    if(check.success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
@@ -208,7 +209,8 @@ certificate.revoke = function(req, res){
     }
 
     // Check API conformity
-    if(validator.checkAPI(schema, req.body).success === false) {
+    var check = validator.checkAPI(schema, req.body)
+    if(check.success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
@@ -307,7 +309,8 @@ certificates.list = function(req, res){
     }
 
     // Check API conformity
-    if(validator.checkAPI(schema, req.body).success === false) {
+    var check = validator.checkAPI(schema, req.body)
+    if(check.success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
@@ -391,7 +394,8 @@ certificate.get = function(req, res) {
     }
 
     // Check API conformity
-    if(validator.checkAPI(schema, req.body).success === false) {
+    var check = validator.checkAPI(schema, req.body)
+    if(check.success === false) {
         wrongAPISchema(check.errors, res);
         return;
     }
