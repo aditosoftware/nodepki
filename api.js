@@ -4,13 +4,14 @@
  */
 
 // 3rd party modules
-var fs          = require('fs');
-var express     = require('express');
-var bodyparser  = require('body-parser');
+var fs          = require('fs')
+var express     = require('express')
+var bodyparser  = require('body-parser')
 
 // Custom modules
-var certapi     = require('./api/certificate.js');
-var caapi        = require('./api/ca.js');
+var certapi     = require('./api/certificate.js')
+var caapi       = require('./api/ca.js')
+var authapi     = require('./api/auth.js')
 
 
 var apipath = '/api/v1';
@@ -37,6 +38,10 @@ var initAPI = function(app) {
 
     app.post(apipath + '/certificate/get/', function(req, res) {
         certapi.certificate.get(req, res);
+    });
+
+    app.post(apipath + '/auth/check/', function(req, res) {
+        authapi.auth.check(req, res);
     });
 };
 
