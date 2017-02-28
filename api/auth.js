@@ -5,19 +5,6 @@ var authMod     = require('../auth.js');
 var auth = {};
 
 
-function wrongLoginCredentials(res) {
-    errors = [
-        { code: 200, message: 'Invalid login credentials.' }
-    ];
-
-    var resobj = {
-        success: false,
-        errors: errors
-    }
-
-    res.end(JSON.stringify(resobj))
-};
-
 /*
  * Response helper function for nicer code :)
  */
@@ -69,12 +56,14 @@ auth.check = function(req, res) {
 
     // Check access
     if (authMod.checkUser(auth.username, auth.password) === false) {
-        wrongLoginCredentials(res);
-        return;
+        respond({
+            success: true,
+            data: { valid: false }
+        }, res);
     } else {
         respond({
             success: true,
-            data: {}
+            data: { valid: true }
         }, res);
     }
 }
