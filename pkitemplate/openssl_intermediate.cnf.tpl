@@ -32,6 +32,9 @@ preserve          = no
 policy            = policy_loose
 unique_subject    = no
 
+# Copy SAN
+copy_extensions = copy
+
 
 [ policy_loose ]
 countryName             = optional
@@ -53,6 +56,9 @@ default_md          = sha256
 
 # Extension to add when the -x509 option is used.
 x509_extensions     = v3_ca
+
+# Copy SAN
+copy_extensions     = copy
 
 prompt = no
 
@@ -96,6 +102,7 @@ subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer:always
 keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
+issuerAltName = issuer:copy
 crlDistributionPoints = URI:{crlurl}
 authorityInfoAccess = OCSP;URI:{ocspurl}
 
