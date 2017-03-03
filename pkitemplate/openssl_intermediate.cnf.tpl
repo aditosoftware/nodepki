@@ -57,9 +57,6 @@ default_md          = sha256
 # Extension to add when the -x509 option is used.
 x509_extensions     = v3_ca
 
-# Copy SAN
-copy_extensions     = copy
-
 prompt = no
 
 [ req_distinguished_name ]
