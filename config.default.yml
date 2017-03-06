@@ -39,7 +39,7 @@ ca:
             country: DE
             url: "http://ca.adito.local:2560"
         crl:
-            url: "http://ca.adito.local:8080/public/intermediate.crl.pem"
+            url: "http://ca.adito.local:8080/public/ca/intermediate/crl"
 
 
 ###

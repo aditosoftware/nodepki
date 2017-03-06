@@ -32,9 +32,6 @@ var createCRL = function() {
     crl.on('exit', function(code, signal){
         if(code === 0) {
             log("CRL successfully created");
-
-            // Copy CRL to public directory
-            fs.copySync(global.paths.pkipath + 'intermediate/crl/crl.pem', global.paths.pkipath + 'public/intermediate.crl.pem');
         } else {
             log.error("Error during CRL creation")
         }

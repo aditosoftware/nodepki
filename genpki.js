@@ -132,13 +132,6 @@ var createFileStructure = function() {
         openssl_apicert = openssl_apicert.replace(/{commonname}/g, global.config.server.http.domain);
         fs.writeFileSync(pkidir + 'apicert/openssl.cnf', openssl_apicert);
 
-
-        /*
-         * Creater public dir
-         */
-        fs.ensureDirSync(pkidir + 'public');
-
-
         resolve();
     });
 };
@@ -157,7 +150,6 @@ var createRootCA = function() {
             exec('openssl req -config openssl.cnf -key root.key.pem -new -x509 -days ' + global.config.ca.root.days + ' -sha256 -extensions v3_ca -out root.cert.pem -passin pass:' + global.config.ca.root.passphrase, {
                 cwd: pkidir + 'root'
             }, function() {
-                fs.copySync(pkidir + 'root/root.cert.pem', pkidir + 'public/root.cert.pem');
                 resolve();
             });
         });
@@ -184,9 +176,6 @@ var createIntermediateCA = function() {
                 }, function() {
                     // Remove intermediate.csr.pem file
                     fs.removeSync(pkidir + 'intermediate/intermediate.csr.pem');
-
-                    // Make intermediate cert public
-                    fs.copySync(pkidir + 'intermediate/intermediate.cert.pem', pkidir + 'public/intermediate.cert.pem');
 
                     // Create CA chain file
                     // Read intermediate

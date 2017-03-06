@@ -20,6 +20,7 @@ var http            = require('http');
 var bodyparser      = require('body-parser');
 
 var api             = require('./api.js');
+var publicDl        = require('./publicDl.js');
 var certdb          = require('./certdb.js');
 var ocsp            = require('./ocsp-server.js');
 var crl             = require('./crl.js');
@@ -103,7 +104,6 @@ certdb.reindex().then(function(){
     /*
      * Start HTTP server
      */
-    app.use('/public', express.static(global.paths.pkipath + 'public'));    // Static dir.
     app.use('/api', bodyparser.json());     // JSON body parser for /api/ paths
 
     var server = app.listen(global.config.server.http.port, global.config.server.ip, function() {
@@ -114,7 +114,8 @@ certdb.reindex().then(function(){
     });
 
     log.info("Registering API endpoints");
-    api.initAPI(app);
+    api.initAPI(app)
+    publicDl.initPublicDl(app)
 }).catch(function(error){
     log.error("Could not initialize CertDB index: " + error);
 });
