@@ -8,7 +8,7 @@
 ## Implemented Features
 
 * Auto-create a PKI with root CA and intermediate CA
-* Request a new signed certificate via [nodepki-client](https://github.com/ThomasLeister/nodepki-client/)
+* Request new certificates
 * List available certificates
 * Download issued certificate files
 * Revoke issued certificate
@@ -22,7 +22,10 @@
 * NodeJS
 * NPM
 * OpenSSL
-* Bash Shell (?)
+
+## Run NodePKI with Docker
+
+**The recommended way to run NodePKI is to make use of the NodePKI Docker image.** Find more information here: [NodePKI Docker image](https://github.com/ThomasLeister/nodepki-docker/)
 
 
 ## Setup instructions
@@ -59,21 +62,17 @@ Start your API server:
     nodejs server.js
 
 
-
 ## Request new certificate
 
-
-* Create certificate key:
+Create certificate key:
 
     openssl genrsa -aes256 -out certkey.pem 2048
 
-
-* Create certificate request:
+Create certificate request:
 
     openssl req -config mypki/openssl.cnf -key certkey.pem -new -sha256 -out cert.csr
 
-
-* Use nodepki-client to submit the request:
+Use [nodepki-client](https://github.com/ThomasLeister/nodepki-client/) to submit the request:
 
     nodejs client.js request --csr cert.csr
 
