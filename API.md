@@ -1,6 +1,6 @@
 # API
 
-API Request bodies consist of a "data" object containing parameters for the requested operation and a "auth" object containing username and password of the user:
+API Request bodies consist of a "data" object containing parameters for the requested operation and an "auth" object containing username and password of the user:
 
     {
         data: {
@@ -8,7 +8,7 @@ API Request bodies consist of a "data" object containing parameters for the requ
         },
         auth: {
             username: "thomas",
-            password: "thomaspass"
+            password: "test"
         }
     }
 
@@ -20,6 +20,26 @@ API response bodies:
         success: <bool>,
         <more attributes>
     }
+
+
+## Examples
+
+For better unstanding the general API usage: Two examples with cURL (the "-d" argument contains the JSON-formatted request)
+
+List all issued certificates:
+
+```
+curl -H "Content-type: application/json" -d '{ "data": { "state":"all" }, "auth": { "username":"thomas", "password":"test" } }' http://localhost:8080/api/v1/certificates/list
+```
+
+
+Request certificate from CSR:
+
+```
+curl -H "Content-type: application/json" -d '{ "data": { "applicant":"Thomas", "csr":"---CERTIFICATE SIGNING REQUEST---", "lifetime":365, "type":"server" }, "auth": { "username":"thomas", "password":"test" } }' http://localhost:8080/api/v1/certificate/request
+```
+
+
 
 ## Certificates
 
@@ -35,6 +55,7 @@ API response bodies:
 
     Response attributes:
     * cert: <String> | certificate
+
 
 
 ### Revoke certificate

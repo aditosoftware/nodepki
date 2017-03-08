@@ -25,12 +25,12 @@
 
 ## Run NodePKI with Docker
 
-**The recommended way to run NodePKI is to make use of the NodePKI Docker image.** Find more information here: [NodePKI Docker image](https://github.com/ThomasLeister/nodepki-docker/)
+**The recommended way to run NodePKI is to make use of the NodePKI Docker image.** Find more information here: [NodePKI Docker image](https://github.com/aditosoftware/nodepki-docker/)
 
 
 ## Setup instructions
 
-    git clone https://github.com/ThomasLeister/nodepki.git
+    git clone https://github.com/aditosoftware/nodepki.git
     cd nodepki
     npm install  
 
@@ -58,28 +58,14 @@ There is an example config file "config.yml.default" which can be copied to "con
 
 Start your API server:
 
-
     nodejs server.js
 
 
-## Request new certificate
+## API usage
 
-Create certificate key:
-
-    openssl genrsa -aes256 -out certkey.pem 2048
-
-Create certificate request:
-
-    openssl req -config mypki/openssl.cnf -key certkey.pem -new -sha256 -out cert.csr
-
-Use [nodepki-client](https://github.com/ThomasLeister/nodepki-client/) to submit the request:
-
-    nodejs client.js request --csr cert.csr
+For information on how to use the API, read [API.md](/API.md)
 
 
+## Using the server via client
 
-## OCSP Query
-
-Check certificate validity, e.G. via:
-
-    openssl ocsp -url http://192.168.42.53:2560 -resp_text -CAfile ../../nodepki/mypki/intermediate/ca-chain.cert.pem -issuer ../../nodepki/mypki/intermediate/intermediate.cert.pem -cert cert.pem
+Use [nodepki-client](https://github.com/aditosoftware/nodepki-client/) to request certificates and manage your PKI. If you prefer using a GUI, consider using [nodepki-webclient](https://github.com/aditosoftware/nodepki-webclient/).
