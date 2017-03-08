@@ -15,15 +15,16 @@ const pkidir = __dirname + '/data/' + 'mypki/';
 /*
  * Make sure there is a config file config.yml
  */
-if(fs.existsSync('data/config/config.yml')) {
-    log.info("Reading config file data/config/config.yml ...");
-    global.config = yaml.safeLoad(fs.readFileSync('data/config/config.yml', 'utf8'));
+var configFilePath = __dirname + '/data/config/config.yml';
+if(fs.existsSync(configFilePath)) {
+    log.info("Reading config file " + configFilePath + " ...");
+    global.config = yaml.safeLoad(fs.readFileSync(configFilePath, 'utf8'));
 } else {
     // There is no config file yet. Create one from config.yml.default and quit server.
-    log("No custom config file 'data/config/config.yml' found.");
-    fs.ensureDirSync('data/config');
-    fs.copySync('config.default.yml', 'data/config/config.yml');
-    log("Default config file was copied to data/config/config.yml.");
+    log("No custom config file '" + configFilePath + "' found.");
+    fs.ensureDirSync(__dirname + '/data/config');
+    fs.copySync(__dirname + 'config.default.yml', configFilePath);
+    log("Default config file was copied to " + configFilePath + ".");
     console.log("\
 **********************************************************************\n\
 ***   Please customize data/config/config.yml according to your    ***\n\
