@@ -25,6 +25,7 @@ var certdb          = require('./certdb.js');
 var ocsp            = require('./ocsp-server.js');
 var crl             = require('./crl.js');
 var fingerprint     = require('./cert_fingerprint.js');
+var genpki          = require('./genpki.js');
 
 var app             = express();
 
@@ -48,105 +49,126 @@ global.paths = {
 };
 
 
-/*
- * Make sure there is a config file config.yml
- */
-if(fs.existsSync('data/config/config.yml')) {
-    log.info("Reading config file data/config/config.yml ...");
-    global.config = yaml.safeLoad(fs.readFileSync('data/config/config.yml', 'utf8'));
-} else {
-    // There is no config file yet. Create one from config.yml.default and quit server.
-    log("No custom config file 'data/config/config.yml' found.");
-    fs.ensureDirSync('data/config');
-    fs.copySync('config.default.yml', 'data/config/config.yml');
-    log("Default config file was copied to data/config/config.yml.");
-    console.log("\
-**********************************************************************\n\
-***   Please customize data/config/config.yml according to your    ***\n\
-***                 environment and restart script.                ***\n\
-**********************************************************************");
 
-    log("Server will now quit.");
-    process.exit();
-}
-
-
-/*
- * Check if the openssl command is available
- */
-
-if(commandExists('openssl') === false) {
-    log("openssl command is not available. Please install openssl.")
-    process.exit();
-}
-
-
-/*
- * Check if there is a PKI directory with all the OpenSSL contents.
- */
-
-fs.ensureDir(global.paths.pkipath);
-if(fs.existsSync(global.paths.pkipath + 'created') === false) {
-    log("There is no PKI available. Please generate the content of mypki by executing 'nodejs genpki.js'.");
-    process.exit();
-}
-
-
-// Ensure tmp dir
-fs.ensureDir('tmp');
-
-// Make sure DB file exists ...
-fs.ensureFileSync('data/user.db');
-
-
-// Re-index cert database
-certdb.reindex().then(function(){
+new Promise(function(resolve, reject) {
+    // Checks environment
     /*
-     * Start HTTP server
+     * Make sure there is a config file config.yml
      */
-    app.use('/api', bodyparser.json());     // JSON body parser for /api/ paths
+    if(fs.existsSync(global.paths.datapath + 'config/config.yml')) {
+        log.info("Reading config file data/config/config.yml ...");
+        global.config = yaml.safeLoad(fs.readFileSync(global.paths.datapath + 'config/config.yml', 'utf8'));
 
-    var server = app.listen(global.config.server.http.port, global.config.server.ip, function() {
-        var host = server.address().address;
-        var port = server.address().port;
+        /*
+         * Check if the openssl command is available
+         */
 
-        log.info(">>>>>> HTTP server is listening on " + host + ":" + port + " <<<<<<");
+        if(commandExists('openssl') === false) {
+            log("openssl command is not available. Please install openssl.")
+            reject()
+        } else {
+            /*
+             * Check if there is a PKI directory with all the OpenSSL content.
+             */
+
+            fs.ensureDir(global.paths.pkipath);
+            if(fs.existsSync(global.paths.pkipath + 'created') === false) {
+                log("There is no PKI available. Creating PKI ...");
+
+                genpki.create().then(function() {
+                    log(">>>>>> CA has successfully been created! :-) <<<<<<")
+                    resolve()
+                })
+                .catch(function(err) {
+                    reject(err)
+                })
+            } else {
+                resolve()
+            }
+        }
+    } else {
+        // There is no config file yet. Create one from config.yml.default and quit server.
+        log("No custom config file 'data/config/config.yml' found.");
+        fs.ensureDirSync(global.paths.datapath +'config');
+        fs.copySync(__dirname + '/config.default.yml', global.paths.datapath + 'config/config.yml');
+        log("Default config file was copied to data/config/config.yml.");
+        console.log("\
+        **********************************************************************\n\
+        ***   Please customize data/config/config.yml according to your    ***\n\
+        ***                 environment and restart script.                ***\n\
+        **********************************************************************");
+
+        log("Server will now quit.");
+        reject()
+    }
+})
+.then(function() {
+    // Ensure tmp dir
+    fs.ensureDir('tmp');
+
+    // Make sure DB file exists ...
+    fs.ensureFileSync('data/user.db');
+
+    // Re-index cert database
+    certdb.reindex().then(function(){
+        /*
+         * Start HTTP server
+         */
+        app.use('/api', bodyparser.json());     // JSON body parser for /api/ paths
+
+        var server = app.listen(global.config.server.http.port, global.config.server.ip, function() {
+            var host = server.address().address;
+            var port = server.address().port;
+
+            log.info(">>>>>> HTTP server is listening on " + host + ":" + port + " <<<<<<");
+        });
+
+        log.info("Registering API endpoints");
+        api.initAPI(app)
+        publicDl.initPublicDl(app)
+    }).catch(function(error){
+        log.error("Could not initialize CertDB index: " + error);
     });
 
-    log.info("Registering API endpoints");
-    api.initAPI(app)
-    publicDl.initPublicDl(app)
-}).catch(function(error){
-    log.error("Could not initialize CertDB index: " + error);
-});
 
-
-// Start OCSP server
-ocsp.startServer()
-.then(function(){
-    log.info("OCSP-Server is running");
-})
-.catch(function(error){
-    log.error("Could not start OCSP server: " + error);
-});
+    // Start OCSP server
+    ocsp.startServer()
+    .then(function(){
+        log.info("OCSP-Server is running");
+    })
+    .catch(function(error){
+        log.error("Could not start OCSP server: " + error);
+    });
 
 
 
-// Show Root Cert fingerprint
-fingerprint.getFingerprint(global.paths.pkipath + 'root/root.cert.pem').then(function(fingerprint_out) {
-    log(">>>>>> Root CA Fingerprint: " + fingerprint_out);
+    // Show Root Cert fingerprint
+    fingerprint.getFingerprint(global.paths.pkipath + 'root/root.cert.pem').then(function(fingerprint_out) {
+        log(">>>>>> Root CA Fingerprint: " + fingerprint_out);
+    })
+    .catch(function(err) {
+        log.error("Could not get Root CA fingerprint!")
+    });
+
+
+
+    /*
+     * CRL renewal cronjob
+     */
+    var crlrenewint = 1000 * 60 * 60 * 24; // 24h
+    setInterval(crl.createCRL, crlrenewint);
+
+    log("Server started.")
 })
 .catch(function(err) {
-    log.error("Could not get Root CA fingerprint!")
-});
+    log("Server not started.")
+    if(err != undefined) {
+        log("Error: " + err)
+    }
+    process.exit()
+})
 
 
-
-/*
- * CRL renewal cronjob
- */
-var crlrenewint = 1000 * 60 * 60 * 24; // 24h
-setInterval(crl.createCRL, crlrenewint);
 
 
 
@@ -166,10 +188,3 @@ var stopServer = function() {
 process.on('SIGINT', stopServer);
 process.on('SIGHUP', stopServer);
 process.on('SIGQUIT', stopServer);
-
-
-
-// Export app variable
-module.exports = {
-    app: app,
-};

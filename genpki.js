@@ -12,30 +12,6 @@ const pkidir = __dirname + '/data/' + 'mypki/';
 
 
 
-/*
- * Make sure there is a config file config.yml
- */
-var configFilePath = __dirname + '/data/config/config.yml';
-if(fs.existsSync(configFilePath)) {
-    log.info("Reading config file " + configFilePath + " ...");
-    global.config = yaml.safeLoad(fs.readFileSync(configFilePath, 'utf8'));
-} else {
-    // There is no config file yet. Create one from config.yml.default and quit server.
-    log("No custom config file '" + configFilePath + "' found.");
-    fs.ensureDirSync(__dirname + '/data/config');
-    fs.copySync(__dirname + 'config.default.yml', configFilePath);
-    log("Default config file was copied to " + configFilePath + ".");
-    console.log("\
-**********************************************************************\n\
-***   Please customize data/config/config.yml according to your    ***\n\
-***                 environment and restart script.                ***\n\
-**********************************************************************");
-
-    log("Script will now quit.");
-    process.exit();
-}
-
-
 var PKIExists = function() {
         fs.ensureDir(pkidir);
 
@@ -276,46 +252,42 @@ var setFilePerms = function() {
 
 
 
-/**
- * Start all the things!
- */
-if(PKIExists() === false) {
-    log("There is no PKI. Creating ...")
+module.exports.create = function() {
+    return new Promise(function(resolve, reject) {
+        createFileStructure().then(function() {
+            createRootCA().then(function() {
+                createIntermediateCA().then(function() {
+                    createOCSPKeys().then(function() {
+                        createAPICert().then(function() {
+                            setFilePerms().then(function() {
+                                log("### Finished!");
 
-    createFileStructure().then(function() {
-        createRootCA().then(function() {
-            createIntermediateCA().then(function() {
-                createOCSPKeys().then(function() {
-                    createAPICert().then(function() {
-                        setFilePerms().then(function() {
-                            log("### Finished!");
-
-                            // Tag mypki as ready.
-                            fs.writeFileSync(pkidir + 'created', '', 'utf8');
+                                // Tag mypki as ready.
+                                fs.writeFileSync(pkidir + 'created', '', 'utf8');
+                                resolve()
+                            })
+                            .catch(function(err) {
+                                reject("Error: " + err)
+                            });
                         })
                         .catch(function(err) {
-                            log("Error: " + err)
+                            reject("Error: " + err)
                         });
                     })
                     .catch(function(err) {
-                        log("Error: " + err)
+                        reject("Error: " + err)
                     });
                 })
                 .catch(function(err) {
-                    log("Error: " + err)
+                    reject("Error: " + err)
                 });
             })
             .catch(function(err) {
-                log("Error: " + err)
-            });
+                reject("Error: " + err)
+            })
         })
         .catch(function(err) {
-            log("Error: " + err)
-        })
+            reject("Error: " + err)
+        });
     })
-    .catch(function(err) {
-        log("Error: " + err)
-    });
-} else {
-    log("Error: There is already a PKI directory mypki")
 }
