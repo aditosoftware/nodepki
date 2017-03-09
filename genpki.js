@@ -67,7 +67,7 @@ var createFileStructure = function() {
 
         // Customize openssl.cnf and copy to root/
 
-        openssl_root = fs.readFileSync('pkitemplate/openssl_root.cnf.tpl', 'utf8');
+        openssl_root = fs.readFileSync(__dirname + '/pkitemplate/openssl_root.cnf.tpl', 'utf8');
         openssl_root = openssl_root.replace(/{basedir}/g, pkidir + 'root');
         openssl_root = openssl_root.replace(/{days}/g, global.config.ca.root.days);
         openssl_root = openssl_root.replace(/{country}/g, global.config.ca.root.country);
@@ -95,7 +95,7 @@ var createFileStructure = function() {
 
         // Customize openssl.cnf and copy to root/
 
-        openssl_intermediate = fs.readFileSync('pkitemplate/openssl_intermediate.cnf.tpl', 'utf8');
+        openssl_intermediate = fs.readFileSync(__dirname + '/pkitemplate/openssl_intermediate.cnf.tpl', 'utf8');
         openssl_intermediate = openssl_intermediate.replace(/{basedir}/g, pkidir + 'intermediate');
         openssl_intermediate = openssl_intermediate.replace(/{days}/g, global.config.ca.intermediate.days);
         openssl_intermediate = openssl_intermediate.replace(/{country}/g, global.config.ca.intermediate.country);
@@ -112,7 +112,7 @@ var createFileStructure = function() {
          * Prepare intermediate/ocsp dir
          */
         fs.ensureDirSync(pkidir + 'intermediate/ocsp');
-        openssl_intermediate_ocsp = fs.readFileSync('pkitemplate/openssl_ocsp.cnf.tpl', 'utf8');
+        openssl_intermediate_ocsp = fs.readFileSync(__dirname + '/pkitemplate/openssl_ocsp.cnf.tpl', 'utf8');
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{state}/g, global.config.ca.intermediate.state);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{country}/g, global.config.ca.intermediate.country);
         openssl_intermediate_ocsp = openssl_intermediate_ocsp.replace(/{locality}/g, global.config.ca.intermediate.locality);
@@ -125,7 +125,7 @@ var createFileStructure = function() {
          * Prepare apicert configuration
          */
         fs.ensureDirSync(pkidir + 'apicert');
-        openssl_apicert = fs.readFileSync('pkitemplate/openssl_apicert.cnf.tpl', 'utf8');
+        openssl_apicert = fs.readFileSync(__dirname + '/pkitemplate/openssl_apicert.cnf.tpl', 'utf8');
         openssl_apicert = openssl_apicert.replace(/{state}/g, global.config.ca.root.state);
         openssl_apicert = openssl_apicert.replace(/{country}/g, global.config.ca.root.country);
         openssl_apicert = openssl_apicert.replace(/{locality}/g, global.config.ca.root.locality);
