@@ -5,10 +5,12 @@
 server:
     ip: 0.0.0.0
     http:
-        domain: ca.adito.local
+        # E.g.: ca.adito.local
+        domain: CA_API_SERVER_URL
         port: 8080
     ocsp:
-        domain: ca.adito.local
+        # E.g.: ca.adito.local
+        domain: CA_OSCP_SERVER_URL
         port: 2560
 
 
@@ -19,27 +21,45 @@ server:
 
 ca:
     root:
-        passphrase: yyyy
-        days: 3650
-        country: DE
-        state: Bayern
-        locality: Geisenhausen
-        organization: ADITO Software GmbH
-        commonname: Root CA
+        # E.g.: uDaMhCfFVcPJxZgkctKxKE2vYrwYHEnhcp
+        passphrase: ROOT_PASSPHRASE
+        # E.g.: 3650
+        days: CA_CERT_EXPIRE_IN_DAYS
+        # E.g.: DE
+        country: COUNTRY_CODE
+        # E.g.: Bavaria
+        state: STATE_NAME
+        # E.g.: Geisenhausen
+        locality: LOCALITY_NAME
+        # E.g.: ADITO Software GmbH
+        organization: ORGANIZATION_NAME
+        # E.g.: Root CA ADITO
+        commonname: ROOT_CA_COMMON_NAME
     intermediate:
-        passphrase: yyyy
-        days: 3650
-        country: DE
-        state: Bayern
-        locality: Geisenhausen
-        organization: ADITO Software GmbH
-        commonname: Intermediate CA
+        # E.g.: 4vhsDBWtnTXuUsQEBTSxZRKvAj2dKcn
+        passphrase: INTERMEDIATE_PASSPHRASE
+        # E.g.: 3650
+        days: CA_CERT_EXPIRE_IN_DAYS
+        # E.g.: DE
+        country: COUNTRY_CODE
+        # E.g.: Bavaria
+        state: STATE_NAME
+        # E.g.: Geisenhausen
+        locality: LOCALITY_NAME
+        # E.g.: ADITO Software GmbH
+        organization: ORGANIZATION_NAME
+        # E.g.: Intermediate CA ADITO
+        commonname: INTERMEDIATE_CA_COMMON_NAME
         ocsp:
-            passphrase: yyyy
-            country: DE
-            url: "http://ca.adito.local:2560"
+            # E.g.: gpCnCFZuraQYtQaQNWs4apWK2W
+            passphrase: OCSP_PASSPHRASE
+            # E.g.: DE
+            country: COUNTRY_CODE
+            # E.g.: http://ca.adito.local:2560
+            url: CA_OSCP_SERVER_HTTP_URL
         crl:
-            url: "http://ca.adito.local:8080/public/ca/intermediate/crl"
+            # E.g.: http://ca.adito.local:8080/public/ca/intermediate/crl
+            url: CA_CRL_SERVER_HTTP_URL
 
 
 ###
@@ -47,4 +67,5 @@ ca:
 ###
 cert:
     lifetime_default: 1
-    lifetime_max: 365
+    # E.g.: 365
+    lifetime_max: CERT_LIFETIME_IN_DAYS
