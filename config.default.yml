@@ -3,15 +3,18 @@
 ###
 
 server:
-    ip: 0.0.0.0
+    # E.g.: 0.0.0.0
+    ip: CA_API_SERVER_BIND_IP_ADDRESS
     http:
         # E.g.: ca.adito.local
         domain: CA_API_SERVER_URL
-        port: 8080
+        # E.g.: 8080
+        port: CA_API_SERVER_PLAIN_PORT
     ocsp:
         # E.g.: ca.adito.local
         domain: CA_OSCP_SERVER_URL
-        port: 2560
+        # E.g.: 2560
+        port: CA_OSCP_SERVER_PORT
 
 
 
@@ -66,6 +69,7 @@ ca:
 ### Settings for end user certificates
 ###
 cert:
-    lifetime_default: 1
+    # E.g.: 1
+    lifetime_default: CERT_MIN_LIFETIME_IN_DAYS
     # E.g.: 365
-    lifetime_max: CERT_LIFETIME_IN_DAYS
+    lifetime_max: CERT_MAX_LIFETIME_IN_DAYS
